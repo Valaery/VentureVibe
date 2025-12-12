@@ -523,7 +523,7 @@ This is a **portfolio project** demonstrating full-stack development capabilitie
 
 **VentureVibe** - *AI-Powered Product Validation Platform*
 
-*A portfolio project by [Joan Alcaraz]*
+*A portfolio project by Joan Alcaraz*
 
 Showcasing modern full-stack development with AI integration
 
