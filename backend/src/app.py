@@ -40,7 +40,7 @@ def create_app() -> FastAPI:
 
     @app.get("/")
     async def root():
-        return {"message": "Welcome to Story LLM Backend"}
+        return {"message": "Welcome to Venture Vibe Backend"}
 
     return app
 

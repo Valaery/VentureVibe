@@ -22,7 +22,7 @@ async def get_research(
     current_user: User = Depends(get_current_user),
     workflow_service: WorkflowService = Depends(get_workflow_service)
 ):
-    result = await workflow_service.get_result(idea_id) # assuming get_result takes idea_id
+    result = await workflow_service.get_result(idea_id)
     if not result:
         raise HTTPException(status_code=404, detail="Research not found")
     return result

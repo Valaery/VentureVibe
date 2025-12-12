@@ -2,8 +2,6 @@ from pydantic_ai import Agent
 from src.application.ports.agent_service import AgentService
 from src.config.settings import settings
 import os
-
-# Define response models if needed, or use dicts
 from pydantic import BaseModel, Field
 from typing import List
 
@@ -21,8 +19,8 @@ class PydanticAgentAdapter(AgentService):
             os.environ["OPENAI_BASE_URL"] = settings.OPENAI_BASE_URL
             os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY
         
-        # Using the requested model
-        model_name = 'openai:google/gemini-2.5-flash-lite'
+
+        model_name = settings.LLM_MODEL
         
         self.strategist_agent = Agent[str](
             model_name,
@@ -43,5 +41,5 @@ class PydanticAgentAdapter(AgentService):
     async def analyze_market(self, idea_content: str, strategy: str) -> dict:
         prompt = f"Idea: {idea_content}\nStrategy: {strategy}\n\nProvide market analysis, feasibility score (0-100), competitors, and advice."
         result = await self.analyst_agent.run(prompt)
-        # result.output is MarketAnalysisResponse
+
         return result.output.model_dump()

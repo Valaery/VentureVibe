@@ -9,14 +9,15 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 ENV_FILE = PROJECT_ROOT / ".env"
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Story LLM"
+    PROJECT_NAME: str = "Venture Vibe"
     MONGODB_URL: str = "mongodb://localhost:27017"
-    MONGODB_DB: str = "story_llm"
+    MONGODB_DB: str = "venture_vibe"
     SECRET_KEY: str = "your-secret-key-change-me-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_BASE_URL: str = "https://openrouter.ai/api/v1"
+    LLM_MODEL: str = "openai:google/gemini-2.5-flash-lite"
 
     model_config = ConfigDict(
         env_file=str(ENV_FILE),
