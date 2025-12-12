@@ -104,7 +104,7 @@ Create a `.env` file in the root directory:
 ```env
 # MongoDB
 MONGODB_URL=mongodb://localhost:27017
-DATABASE_NAME=venturevibe_db
+DATABASE_NAME=venture_vibe
 
 # JWT Authentication
 SECRET_KEY=your-secret-key-here-change-in-production-use-openssl-rand-hex-32
@@ -238,11 +238,6 @@ venturevibe/
 │   │   │   └── api/                    # Axios client configuration
 │   │   └── lib/                         # Utility functions
 │   └── public/                          # Static assets
-│
-├── docs/                                # Documentation
-│   └── agent_outputs/
-│       └── market-research-analyst/    # VentureVibe branding docs
-├── .claude/                             # AI assistant documentation
 ├── docker-compose.yml                   # MongoDB setup
 ├── pyproject.toml                       # Python dependencies (Poetry)
 ├── package.json                         # Frontend dependencies
@@ -440,23 +435,6 @@ curl https://api.openai.com/v1/models \
 
 # Check rate limits and billing at platform.openai.com
 ```
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! We appreciate:
-
-- 🐛 Bug reports
-- 💡 Feature requests
-- 📖 Documentation improvements
-- 🔧 Code contributions
 
 ---
 
