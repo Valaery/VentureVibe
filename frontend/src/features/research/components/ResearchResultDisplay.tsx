@@ -1,6 +1,9 @@
 import React from 'react';
+
 import ReactMarkdown from 'react-markdown';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ProgressCircle } from '@/components/ui/progress-circle';
+import { Badge } from '@/components/ui/badge';
 
 interface ResearchResultProps {
     result: {
@@ -19,11 +22,8 @@ export const ResearchResultDisplay: React.FC<ResearchResultProps> = ({ result })
                     <CardHeader>
                         <CardTitle className="text-blue-700 dark:text-blue-300">Feasibility Score</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div className="flex items-center justify-center">
-                            <span className="text-6xl font-bold text-blue-600 dark:text-blue-400">{result.feasibility_score}</span>
-                            <span className="text-2xl text-blue-400 dark:text-blue-500 ml-2">/100</span>
-                        </div>
+                    <CardContent className="flex items-center justify-center py-8">
+                        <ProgressCircle value={result.feasibility_score} />
                     </CardContent>
                 </Card>
 
@@ -32,11 +32,13 @@ export const ResearchResultDisplay: React.FC<ResearchResultProps> = ({ result })
                         <CardTitle>Competitors</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ul className="list-disc pl-5 space-y-2">
+                        <div className="flex flex-wrap gap-2">
                             {result.competitors.map((comp, i) => (
-                                <li key={i} className="text-muted-foreground">{comp}</li>
+                                <Badge key={i} variant="secondary" className="px-3 py-1 text-sm shadow-sm">
+                                    {comp}
+                                </Badge>
                             ))}
-                        </ul>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

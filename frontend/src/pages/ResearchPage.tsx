@@ -1,3 +1,4 @@
+import { VentureVibeLogo } from '@/components/brand/VentureVibeLogo';
 import React, { useState } from 'react';
 import { ResearchForm } from '@/features/research/components/ResearchForm';
 import { ResearchResultDisplay } from '@/features/research/components/ResearchResultDisplay';
@@ -23,19 +24,27 @@ const ResearchPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-950 dark:via-blue-950/30 dark:to-indigo-950/50 pb-10">
-            <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+            <header className="sticky top-0 z-50 border-b border-white/20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60 shadow-lg shadow-primary/5 transition-all duration-300">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                            VentureVibe
-                        </h1>
-                        <span className="hidden sm:inline-block text-xs text-muted-foreground border-l pl-3 ml-1">
-                            AI-Powered Validation
-                        </span>
+                        <VentureVibeLogo size="md" />
+                        <div className="flex flex-col">
+                            <h1 className="text-2xl font-bold font-display bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                                VentureVibe
+                            </h1>
+                            <span className="hidden sm:inline-block text-xs text-muted-foreground">
+                                AI-Powered Validation
+                            </span>
+                        </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <span className="text-sm text-muted-foreground hidden md:inline">Welcome, {user?.email}</span>
-                        <Button variant="outline" size="sm" onClick={logout} className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive">Logout</Button>
+                        <div className="hidden md:flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                                {user?.email?.[0].toUpperCase()}
+                            </div>
+                            <span className="text-sm text-muted-foreground">{user?.email}</span>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={logout} className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive transition-all duration-200">Logout</Button>
                     </div>
                 </div>
             </header>

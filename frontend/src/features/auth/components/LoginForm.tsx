@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
+import { VentureVibeLogo } from '@/components/brand/VentureVibeLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,11 +23,12 @@ export const LoginForm: React.FC = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950">
-            <Card className="w-[420px] shadow-2xl border-2 border-primary/20">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950 animate-in fade-in duration-500">
+            <Card className="w-[420px] shadow-2xl border-2 border-primary/20 backdrop-blur-sm bg-white/90 dark:bg-slate-950/90">
                 <CardHeader className="space-y-3">
-                    <div className="flex items-center justify-center mb-2">
-                        <div className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                    <div className="flex flex-col items-center justify-center mb-4 gap-2">
+                        <VentureVibeLogo size="lg" animated />
+                        <div className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-display">
                             VentureVibe
                         </div>
                     </div>

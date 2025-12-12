@@ -27,17 +27,20 @@ export const ResearchForm: React.FC<ResearchFormProps> = ({ onSubmit, isLoading 
                 <CardDescription>Tell us about your product concept and target audience to get instant AI-powered insights.</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                     <div className="space-y-2">
                         <Label htmlFor="content">Product Idea</Label>
                         <Textarea
                             id="content"
-                            placeholder="Describe your product idea in detail..."
+                            placeholder="Describe your product idea in detail (e.g., 'A subscription service for high-end coffee beans with AI-based taste matching')..."
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                             required
                             className="min-h-[120px]"
                         />
+                        <p className="text-xs text-muted-foreground text-right border-t pt-2 mt-2">
+                            {content.length} characters
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="audience">Target Audience</Label>
@@ -53,7 +56,8 @@ export const ResearchForm: React.FC<ResearchFormProps> = ({ onSubmit, isLoading 
                 <CardFooter>
                     <Button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-primary via-secondary to-accent hover:from-primary/90 hover:via-secondary/90 hover:to-accent/90 shadow-lg"
+                        variant="premium"
+                        className="w-full"
                         disabled={isLoading}
                         size="lg"
                     >
