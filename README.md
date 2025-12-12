@@ -76,8 +76,8 @@
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd story-llm
+git clone https://github.com/Valaery/VentureVibe
+cd VentureVibe
 ```
 
 ### 2. Backend Setup
@@ -478,7 +478,7 @@ This is a **portfolio project** demonstrating full-stack development capabilitie
 
 **VentureVibe** - *AI-Powered Product Validation Platform*
 
-*A portfolio project by Joan Alcaraz*
+**A portfolio project by Joan Alcaraz**
 
 Showcasing modern full-stack development with AI integration
 
