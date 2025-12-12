@@ -36,7 +36,7 @@
 - **Framework**: FastAPI (Python 3.12+) - Lightning-fast async API
 - **Database**: MongoDB with Motor - Scalable NoSQL database
 - **AI**: Pydantic AI - Structured AI agent orchestration
-- **LLM**: OpenAI GPT - State-of-the-art language models
+- **LLM**: OpenAI GPT / OpenRouter - State-of-the-art language models
 - **Authentication**: JWT tokens with Argon2/bcrypt password hashing
 - **Observability**: Logfire, Opik, OpenTelemetry instrumentation
 
@@ -67,6 +67,7 @@
 - **Poetry**: Python dependency manager ([Install](https://python-poetry.org/docs/#installation))
 - **Docker**: For MongoDB (or local MongoDB installation)
 - **OpenAI API Key**: Required for AI features ([Get one](https://platform.openai.com/api-keys))
+- **OpenRouter API Key**: Alternative for accessing various models ([Get one](https://openrouter.ai/keys))
 
 ---
 
@@ -112,6 +113,9 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 # OpenAI (Required)
 OPENAI_API_KEY=sk-your-openai-api-key-here
+
+# OpenRouter (Optional - for alternative models)
+OPENROUTER_API_KEY=sk-or-your-openrouter-api-key-here
 
 # Logfire (Optional - for observability)
 LOGFIRE_TOKEN=your-logfire-token-here
@@ -439,19 +443,6 @@ curl https://api.openai.com/v1/models \
 
 ---
 
-## 🎯 Roadmap
-
-- [ ] **Export Reports** - PDF/JSON export functionality
-- [ ] **Team Collaboration** - Multi-user workspaces
-- [ ] **Historical Tracking** - Compare validations over time
-- [ ] **Custom AI Models** - Fine-tuning for specific industries
-- [ ] **API Access** - Public API for integrations
-- [ ] **Mobile App** - Native iOS/Android apps
-- [ ] **Advanced Analytics** - Trends, insights dashboard
-- [ ] **White-Label** - Custom branding for enterprise
-
----
-
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -466,17 +457,6 @@ Contributions are welcome! We appreciate:
 - 💡 Feature requests
 - 📖 Documentation improvements
 - 🔧 Code contributions
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting PRs.
-
----
-
-## 📧 Support
-
-- **Documentation**: [docs.venturevibe.com](https://docs.venturevibe.com) (coming soon)
-- **Issues**: [GitHub Issues](https://github.com/your-org/venturevibe/issues)
-- **Email**: support@venturevibe.com
-- **Discord**: [Join our community](https://discord.gg/venturevibe) (coming soon)
 
 ---
 
