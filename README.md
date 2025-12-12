@@ -111,11 +111,8 @@ SECRET_KEY=your-secret-key-here-change-in-production-use-openssl-rand-hex-32
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-# OpenAI (Required)
+# OpenAI (Required, can use OpenRouter API Key instead)
 OPENAI_API_KEY=sk-your-openai-api-key-here
-
-# OpenRouter (Optional - for alternative models)
-OPENROUTER_API_KEY=sk-or-your-openrouter-api-key-here
 
 # Logfire (Optional - for observability)
 LOGFIRE_TOKEN=your-logfire-token-here
