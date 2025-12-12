@@ -1,5 +1,12 @@
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from typing import Optional
+import os
+from pathlib import Path
+
+# Get the project root directory (parent of backend/)
+PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+ENV_FILE = PROJECT_ROOT / ".env"
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Story LLM"
@@ -11,7 +18,10 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_BASE_URL: str = "https://openrouter.ai/api/v1"
 
-    class Config:
-        env_file = ".env"
+    model_config = ConfigDict(
+        env_file=str(ENV_FILE),
+        env_file_encoding='utf-8',
+        extra='ignore'  # Allow extra fields in .env without validation errors
+    )
 
 settings = Settings()

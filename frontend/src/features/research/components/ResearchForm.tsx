@@ -21,10 +21,10 @@ export const ResearchForm: React.FC<ResearchFormProps> = ({ onSubmit, isLoading 
     };
 
     return (
-        <Card className="w-full max-w-2xl mx-auto shadow-lg border-2 border-primary/10">
+        <Card className="w-full max-w-2xl mx-auto shadow-xl border-2 border-primary/20 bg-card/50 backdrop-blur">
             <CardHeader>
-                <CardTitle className="text-2xl text-primary">New Product Research</CardTitle>
-                <CardDescription>Tell us about your product idea and target audience.</CardDescription>
+                <CardTitle className="text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Validate Your Product Idea</CardTitle>
+                <CardDescription>Tell us about your product concept and target audience to get instant AI-powered insights.</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
@@ -32,17 +32,18 @@ export const ResearchForm: React.FC<ResearchFormProps> = ({ onSubmit, isLoading 
                         <Label htmlFor="content">Product Idea</Label>
                         <Textarea
                             id="content"
-                            placeholder="Describe your product idea..."
+                            placeholder="Describe your product idea in detail..."
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                             required
+                            className="min-h-[120px]"
                         />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="audience">Target Audience</Label>
                         <Input
                             id="audience"
-                            placeholder="e.g., Remote workers, Coffee lovers..."
+                            placeholder="e.g., Remote workers, Coffee enthusiasts, SaaS founders..."
                             value={audience}
                             onChange={(e) => setAudience(e.target.value)}
                             required
@@ -50,14 +51,19 @@ export const ResearchForm: React.FC<ResearchFormProps> = ({ onSubmit, isLoading 
                     </div>
                 </CardContent>
                 <CardFooter>
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    <Button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-primary via-secondary to-accent hover:from-primary/90 hover:via-secondary/90 hover:to-accent/90 shadow-lg"
+                        disabled={isLoading}
+                        size="lg"
+                    >
                         {isLoading ? (
                             <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Analyzing with Agents...
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                AI Agents Analyzing...
                             </>
                         ) : (
-                            'Start Research'
+                            'Get Instant Validation'
                         )}
                     </Button>
                 </CardFooter>

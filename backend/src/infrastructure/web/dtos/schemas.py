@@ -1,15 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional, List
-from src.domain.value_objects import Email, FeasibilityScore
 
 class UserCreate(BaseModel):
-    email: Email
+    email: EmailStr
     password: str
     full_name: Optional[str] = None
 
 class UserRead(BaseModel):
     id: str
-    email: Email
+    email: EmailStr
     full_name: Optional[str] = None
     is_active: bool
 
@@ -25,6 +24,6 @@ class ResearchResponse(BaseModel):
     id: str
     idea_id: str
     market_analysis: str
-    feasibility_score: FeasibilityScore
+    feasibility_score: int
     competitors: List[str]
     strategic_advice: str

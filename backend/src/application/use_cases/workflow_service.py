@@ -17,7 +17,7 @@ class WorkflowService:
         self.result_repository = result_repository
         self.agent_service = agent_service
 
-    async def run_research(self, user_id: str, content: str, target_audience: str) -> ResearchResult:
+    async def execute_research(self, user_id: str, content: str, target_audience: str) -> ResearchResult:
         # 1. Save Idea
         idea = ProductIdea(
             user_id=user_id,

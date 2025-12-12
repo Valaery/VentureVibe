@@ -8,22 +8,8 @@ from unittest.mock import AsyncMock, MagicMock
 @pytest.fixture
 def mock_user_repo():
     repo = MagicMock()
-    users_db = {}
-    
-    async def create(user):
-        # Store user in the "db" using email as key
-        # We need to simulate that the object returned has attributes like access via dot notation if it's an object,
-        # or just store the object itself. 
-        # The Application (AuthService) creates a User entity.
-        # The repo.create method receives a User entity.
-        users_db[str(user.email)] = user
-        return user
-        
-    async def get_by_email(email):
-        return users_db.get(str(email))
-
-    repo.create = AsyncMock(side_effect=create)
-    repo.get_by_email = AsyncMock(side_effect=get_by_email)
+    repo.get_by_email = AsyncMock(return_value=None)
+    repo.create = AsyncMock(return_value={"id": "123", "email": "test@example.com", "full_name": "Test User", "hashed_password": "hashed"})
     return repo
 
 @pytest.fixture

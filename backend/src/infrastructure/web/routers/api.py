@@ -14,7 +14,7 @@ async def create_research(
 ):
     # Depending on agent speed, this might be slow for a synchronous HTTP request.
     # In production, use background tasks or Celery. For this task, async await is okay.
-    return await workflow_service.run_research(current_user.id, request.content, request.target_audience)
+    return await workflow_service.execute_research(current_user.id, request.content, request.target_audience)
 
 @router.get("/{idea_id}", response_model=ResearchResponse)
 async def get_research(

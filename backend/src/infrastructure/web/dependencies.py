@@ -8,7 +8,7 @@ from src.application.ports.repositories import UserRepository
 from src.infrastructure.adapters.repositories.mongo_user_repository import MongoUserRepository
 from src.domain.entities import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 async def get_user_repository() -> UserRepository:
     return MongoUserRepository()
@@ -33,6 +33,7 @@ async def get_current_user(
     user = await user_repository.get_by_email(email)
     if user is None:
         raise credentials_exception
+    
     return user
 
 from src.application.use_cases.auth_service import AuthService

@@ -23,8 +23,8 @@ class AuthService:
 
     async def login_user(self, email: str, password: str) -> dict:
         user = await self.user_repository.get_by_email(email)
-        if not user or not verify_password(password, str(user.hashed_password)):
+        if not user or not verify_password(password, user.hashed_password):
             raise InvalidCredentialsException()
         
-        access_token = create_access_token(data={"sub": str(user.email), "user_id": user.id})
+        access_token = create_access_token(data={"sub": user.email, "user_id": user.id})
         return {"access_token": access_token, "token_type": "bearer"}
