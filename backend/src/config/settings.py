@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_BASE_URL: str = "https://openrouter.ai/api/v1"
     # Tool-using agents (market sizing, competitor) — stable multi-turn tool use via OpenRouter
-    LLM_MODEL: str = "openai:google/gemini-2.5-flash"
+    LLM_MODEL: str = "openai:google/gemini-3-flash-preview"
     # Reasoning-only agents (strategist, swot, gtm) — superior reasoning, no thought-signature issue
     LLM_MODEL_FLASH3: str = "openai:google/gemini-3-flash-preview"
     # Analyst / synthesizer — most critical agent, max reasoning ceiling
