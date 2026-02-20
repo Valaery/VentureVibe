@@ -17,12 +17,19 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_BASE_URL: str = "https://openrouter.ai/api/v1"
-    LLM_MODEL: str = "openai:google/gemini-2.5-flash-lite"
+    # Tool-using agents (market sizing, competitor) — stable multi-turn tool use via OpenRouter
+    LLM_MODEL: str = "openai:google/gemini-2.5-flash"
+    # Reasoning-only agents (strategist, swot, gtm) — superior reasoning, no thought-signature issue
+    LLM_MODEL_FLASH3: str = "openai:google/gemini-3-flash-preview"
+    # Analyst / synthesizer — most critical agent, max reasoning ceiling
+    LLM_MODEL_PRO3: str = "openai:google/gemini-3.1-pro-preview"
+    # Tavily API key for web search (falls back to DuckDuckGo if not set)
+    TAVILY_API_KEY: Optional[str] = None
 
     model_config = ConfigDict(
         env_file=str(ENV_FILE),
         env_file_encoding='utf-8',
-        extra='ignore'  # Allow extra fields in .env without validation errors
+        extra='ignore'
     )
 
 settings = Settings()
