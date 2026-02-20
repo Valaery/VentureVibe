@@ -44,14 +44,18 @@ class WorkflowService:
 
         # Phase 2: Parallel specialist agents (all depend on strategy)
         logger.info("Phase 2: Running 5 specialist agents in parallel...")
-        analyst_data, market_sizing, competitive, swot_risk_data, gtm = await asyncio.gather(
-            self.agent_service.analyze_market(content, strategy),
-            self.agent_service.size_market(content, strategy),
-            self.agent_service.analyze_competitors(content, strategy),
-            self.agent_service.analyze_swot_risks(content, strategy),
-            self.agent_service.develop_gtm(content, strategy),
-        )
-        logger.info("All 5 specialist agents completed")
+        try:
+            analyst_data, market_sizing, competitive, swot_risk_data, gtm = await asyncio.gather(
+                self.agent_service.analyze_market(content, strategy),
+                self.agent_service.size_market(content, strategy),
+                self.agent_service.analyze_competitors(content, strategy),
+                self.agent_service.analyze_swot_risks(content, strategy),
+                self.agent_service.develop_gtm(content, strategy),
+            )
+            logger.info("All 5 specialist agents completed successfully")
+        except Exception as e:
+            logger.error(f"Parallel agent execution failed: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise
 
         # Construct agent thoughts (simple metadata for now)
         agent_thoughts = [

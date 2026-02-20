@@ -9,8 +9,11 @@ from src.domain.entities import (
     SWOTAnalysis, RiskFactor, GTMStrategy, AgentThought
 )
 import os
+import logging
 from pydantic import BaseModel, Field
 from typing import List, Optional, Literal, Dict, Any
+
+logger = logging.getLogger(__name__)
 
 
 # Intermediate models for multi-field agent outputs
@@ -329,69 +332,105 @@ class PydanticAgentAdapter(AgentService):
 
     async def get_strategy(self, idea_content: str, audience: str) -> str:
         """Get strategic direction from the Product Strategist agent."""
-        prompt = f"""Idea: {idea_content}
+        logger.info("Starting Product Strategist agent")
+        try:
+            prompt = f"""Idea: {idea_content}
 
 Target Audience: {audience}
 
 Provide a strategic direction for this product idea."""
 
-        result = await self.strategist_agent.run(prompt)
-        return result.output
+            result = await self.strategist_agent.run(prompt)
+            logger.info("Product Strategist agent completed successfully")
+            return result.output
+        except Exception as e:
+            logger.error(f"Product Strategist agent failed: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise
 
     async def analyze_market(self, idea_content: str, strategy: str) -> Dict[str, Any]:
         """Synthesize comprehensive market assessment. Returns AnalystOutput fields as dict."""
-        prompt = f"""Idea: {idea_content}
+        logger.info("Starting Research Analyst agent")
+        try:
+            prompt = f"""Idea: {idea_content}
 
 Strategic Direction: {strategy}
 
 Synthesize a comprehensive market assessment covering executive summary, market analysis, strategic advice, feasibility score, confidence level, investment readiness, key assumptions, and recommended next steps."""
 
-        result = await self.analyst_agent.run(prompt)
-        return result.output.model_dump()
+            result = await self.analyst_agent.run(prompt)
+            logger.info("Research Analyst agent completed successfully")
+            return result.output.model_dump()
+        except Exception as e:
+            logger.error(f"Research Analyst agent failed: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise
 
     async def size_market(self, idea_content: str, strategy: str) -> MarketSizing:
         """Research and calculate TAM/SAM/SOM using web search tools."""
-        prompt = f"""Idea: {idea_content}
+        logger.info("Starting Market Sizing Analyst agent")
+        try:
+            prompt = f"""Idea: {idea_content}
 
 Strategic Direction: {strategy}
 
 Research and calculate the market size (TAM/SAM/SOM) for this product idea. Use web search to find credible market data, industry reports, and growth projections."""
 
-        result = await self.market_sizing_agent.run(prompt)
-        return result.output
+            result = await self.market_sizing_agent.run(prompt)
+            logger.info("Market Sizing Analyst agent completed successfully")
+            return result.output
+        except Exception as e:
+            logger.error(f"Market Sizing Analyst agent failed: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise
 
     async def analyze_competitors(self, idea_content: str, strategy: str) -> CompetitiveAnalysis:
         """Identify and analyze competitors using web search tools."""
-        prompt = f"""Idea: {idea_content}
+        logger.info("Starting Competitive Intelligence Analyst agent")
+        try:
+            prompt = f"""Idea: {idea_content}
 
 Strategic Direction: {strategy}
 
 Research and identify direct and indirect competitors. Use web search to find real companies, their positioning, funding data, and competitive weaknesses."""
 
-        result = await self.competitor_agent.run(prompt)
-        return result.output
+            result = await self.competitor_agent.run(prompt)
+            logger.info("Competitive Intelligence Analyst agent completed successfully")
+            return result.output
+        except Exception as e:
+            logger.error(f"Competitive Intelligence Analyst agent failed: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise
 
     async def analyze_swot_risks(self, idea_content: str, strategy: str) -> Dict[str, Any]:
         """Conduct SWOT analysis and identify risk factors. Returns {swot, risks} dict."""
-        prompt = f"""Idea: {idea_content}
+        logger.info("Starting SWOT & Risk Analyst agent")
+        try:
+            prompt = f"""Idea: {idea_content}
 
 Strategic Direction: {strategy}
 
 Conduct a comprehensive SWOT analysis and identify key risk factors with mitigation strategies. Prioritize risks by severity."""
 
-        result = await self.swot_risk_agent.run(prompt)
-        return {
-            "swot": result.output.swot,
-            "risks": result.output.risks
-        }
+            result = await self.swot_risk_agent.run(prompt)
+            logger.info("SWOT & Risk Analyst agent completed successfully")
+            return {
+                "swot": result.output.swot,
+                "risks": result.output.risks
+            }
+        except Exception as e:
+            logger.error(f"SWOT & Risk Analyst agent failed: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise
 
     async def develop_gtm(self, idea_content: str, strategy: str) -> GTMStrategy:
         """Design a go-to-market strategy."""
-        prompt = f"""Idea: {idea_content}
+        logger.info("Starting GTM Strategist agent")
+        try:
+            prompt = f"""Idea: {idea_content}
 
 Strategic Direction: {strategy}
 
 Design a realistic, specific go-to-market strategy including primary channel, secondary channels, pricing model, target ICP, estimated CAC, and time to first revenue."""
 
-        result = await self.gtm_agent.run(prompt)
-        return result.output
+            result = await self.gtm_agent.run(prompt)
+            logger.info("GTM Strategist agent completed successfully")
+            return result.output
+        except Exception as e:
+            logger.error(f"GTM Strategist agent failed: {type(e).__name__}: {str(e)}", exc_info=True)
+            raise
