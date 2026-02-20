@@ -5,10 +5,11 @@ import { ResearchResultDisplay } from '@/features/research/components/ResearchRe
 import { useAuthContext } from '@/features/auth/hooks/useAuthContext';
 import { Button } from '@/components/ui/button';
 import { useResearchMutation } from '@/features/research/hooks/mutations/useResearchMutation';
+import type { ResearchResult } from '@/features/research/data/services/researchService';
 
 const ResearchPage: React.FC = () => {
     const { logout, user } = useAuthContext();
-    const [result, setResult] = useState<any>(null);
+    const [result, setResult] = useState<ResearchResult | null>(null);
     const mutation = useResearchMutation();
 
     const handleResearchSubmit = async (content: string, audience: string) => {
