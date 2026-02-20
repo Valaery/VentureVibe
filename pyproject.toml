@@ -11,7 +11,7 @@ python = "^3.12"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 motor = "*"
-pydantic-ai = "*"
+pydantic-ai = {extras = ["tavily", "duckduckgo"], version = "*"}
 logfire = {extras = ["fastapi"], version = "^4.16.0"}
 python-dotenv = "*"
 openai = "*"

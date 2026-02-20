@@ -3,6 +3,7 @@ from src.domain.entities import ProductIdea, ResearchResult
 from src.application.ports.repositories import ProductIdeaRepository, ResearchResultRepository
 from src.infrastructure.database import get_database
 
+
 class MongoProductIdeaRepository(ProductIdeaRepository):
     def __init__(self):
         self.db = get_database()
@@ -13,17 +14,18 @@ class MongoProductIdeaRepository(ProductIdeaRepository):
         return idea
 
     async def get_by_id(self, idea_id: str) -> Optional[ProductIdea]:
-        doc = await self.collection.find_one({"id": idea_id})
+        doc = await self.collection.find_one({"id": idea_id}, {"_id": 0})
         if doc:
             return ProductIdea(**doc)
         return None
 
     async def get_by_user_id(self, user_id: str) -> List[ProductIdea]:
-        cursor = self.collection.find({"user_id": user_id})
+        cursor = self.collection.find({"user_id": user_id}, {"_id": 0})
         ideas = []
         async for doc in cursor:
             ideas.append(ProductIdea(**doc))
         return ideas
+
 
 class MongoResearchResultRepository(ResearchResultRepository):
     def __init__(self):
@@ -35,7 +37,7 @@ class MongoResearchResultRepository(ResearchResultRepository):
         return result
 
     async def get_by_idea_id(self, idea_id: str) -> Optional[ResearchResult]:
-        doc = await self.collection.find_one({"idea_id": idea_id})
+        doc = await self.collection.find_one({"idea_id": idea_id}, {"_id": 0})
         if doc:
             return ResearchResult(**doc)
         return None
