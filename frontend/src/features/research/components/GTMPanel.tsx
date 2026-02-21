@@ -13,7 +13,7 @@ export const GTMPanel: React.FC<GTMPanelProps> = ({ gtm }) => (
         <Card className="border-primary/20 bg-primary/5">
             <CardContent className="pt-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">Ideal Customer Profile (ICP)</p>
-                <p className="text-sm">{gtm.target_icp}</p>
+                <p className="text-sm text-justify">{gtm.target_icp}</p>
             </CardContent>
         </Card>
 

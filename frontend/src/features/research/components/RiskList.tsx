@@ -25,13 +25,13 @@ export const RiskList: React.FC<RiskListProps> = ({ risks }) => {
                 return (
                     <div key={i} className={`border border-l-4 ${border} pl-4 py-3 rounded-r-lg bg-card`}>
                         <div className="flex items-start justify-between gap-3 mb-1">
-                            <p className="text-sm font-medium">{risk.description}</p>
+                            <p className="text-sm font-medium text-justify">{risk.description}</p>
                             <div className="flex items-center gap-1.5 shrink-0">
                                 <Badge variant="outline" className={`text-xs ${badge}`}>{label}</Badge>
                                 <Badge variant="secondary" className="text-xs capitalize">{risk.category}</Badge>
                             </div>
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-muted-foreground text-justify">
                             <span className="font-medium">Mitigation:</span> {risk.mitigation}
                         </p>
                     </div>

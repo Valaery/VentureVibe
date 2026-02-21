@@ -21,7 +21,7 @@ export const SWOTGrid: React.FC<SWOTGridProps> = ({ swot }) => (
                     {swot[key].map((item, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm">
                             <span className={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
-                            <span>{item}</span>
+                            <span className="text-justify">{item}</span>
                         </li>
                     ))}
                 </ul>

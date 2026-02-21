@@ -37,7 +37,7 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({ thoughts }) => {
                     </div>
                     <div className="pb-3 min-w-0">
                         <p className="text-xs font-semibold text-muted-foreground">{thought.agent_name}</p>
-                        <p className="text-sm mt-0.5">{thought.thought}</p>
+                        <p className="text-sm mt-0.5 text-justify">{thought.thought}</p>
                     </div>
                 </div>
             ))}

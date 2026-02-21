@@ -127,7 +127,7 @@ const markdownComponents = {
     p: ({ node, ...props }: any) => <p className="mb-4 leading-relaxed text-muted-foreground text-justify" {...props} />,
     ul: ({ node, ...props }: any) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
     ol: ({ node, ...props }: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
-    li: ({ node, ...props }: any) => <li className="text-muted-foreground" {...props} />,
+    li: ({ node, ...props }: any) => <li className="text-muted-foreground text-justify" {...props} />,
     strong: ({ node, ...props }: any) => <strong className="font-semibold" {...props} />,
 };
 
@@ -196,7 +196,7 @@ export const ResearchResultDisplay: React.FC<ResearchResultProps> = ({ result })
                                     {result.key_assumptions.map((a, i) => (
                                         <li key={i} className="flex items-start gap-2 text-sm">
                                             <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                                            {a}
+                                            <span className="text-justify">{a}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -223,7 +223,7 @@ export const ResearchResultDisplay: React.FC<ResearchResultProps> = ({ result })
                                                 </svg>
                                             )}
                                         </div>
-                                        <span className={checkedSteps.has(i) ? 'line-through text-muted-foreground' : ''}>{step}</span>
+                                        <span className={`text-justify ${checkedSteps.has(i) ? 'line-through text-muted-foreground' : ''}`}>{step}</span>
                                     </li>
                                 ))}
                             </ol>

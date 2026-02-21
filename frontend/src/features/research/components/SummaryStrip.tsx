@@ -80,7 +80,7 @@ export const SummaryStrip: React.FC<SummaryStripProps> = ({ result }) => {
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-border/50">
-                    <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground">
+                    <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground text-justify">
                         {result.executive_summary}
                     </blockquote>
                 </div>

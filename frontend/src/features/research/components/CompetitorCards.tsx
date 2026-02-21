@@ -25,15 +25,15 @@ const CompetitorCard: React.FC<CompetitorCardProps> = ({ competitor, type }) => 
         <CardContent className="space-y-2 text-sm">
             <div>
                 <span className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Positioning</span>
-                <p className="mt-0.5">{competitor.positioning}</p>
+                <p className="mt-0.5 text-justify">{competitor.positioning}</p>
             </div>
             <div>
                 <span className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Business Model</span>
-                <p className="mt-0.5">{competitor.business_model}</p>
+                <p className="mt-0.5 text-justify">{competitor.business_model}</p>
             </div>
             <div className="bg-green-50 dark:bg-green-900/20 rounded-md p-2">
                 <span className="font-medium text-xs uppercase tracking-wide text-green-700 dark:text-green-300">Key Weakness</span>
-                <p className="mt-0.5 text-green-800 dark:text-green-200">{competitor.primary_weakness}</p>
+                <p className="mt-0.5 text-green-800 dark:text-green-200 text-justify">{competitor.primary_weakness}</p>
             </div>
         </CardContent>
     </Card>
@@ -60,7 +60,7 @@ export const CompetitorCards: React.FC<CompetitorCardsProps> = ({ competitiveAna
 
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">Your Competitive Moat</p>
-                <p className="text-sm">{competitive_moat}</p>
+                <p className="text-sm text-justify">{competitive_moat}</p>
             </div>
 
             {direct_competitors.length > 0 && (
