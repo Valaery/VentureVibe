@@ -124,7 +124,7 @@ const markdownComponents = {
     h1: ({ node, ...props }: any) => <h1 className="text-2xl font-bold mb-4" {...props} />,
     h2: ({ node, ...props }: any) => <h2 className="text-xl font-semibold mb-3" {...props} />,
     h3: ({ node, ...props }: any) => <h3 className="text-lg font-semibold mb-2" {...props} />,
-    p: ({ node, ...props }: any) => <p className="mb-4 leading-relaxed text-muted-foreground" {...props} />,
+    p: ({ node, ...props }: any) => <p className="mb-4 leading-relaxed text-muted-foreground text-justify" {...props} />,
     ul: ({ node, ...props }: any) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
     ol: ({ node, ...props }: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
     li: ({ node, ...props }: any) => <li className="text-muted-foreground" {...props} />,
