@@ -14,7 +14,7 @@ class TestSWOTAgentConfiguration:
 
     @patch('src.infrastructure.adapters.agent_adapter.Agent')
     def test_swot_agent_uses_correct_model(self, mock_agent_class):
-        """Verify SWOT agent is initialized with LLM_MODEL_PRO (Gemini 3.0 Pro)"""
+        """Verify SWOT agent is initialized with LLM_MODEL (Gemini 3 Flash Preview)"""
         adapter = PydanticAgentAdapter()
 
         # Find the call that initialized swot_risk_agent
@@ -26,12 +26,12 @@ class TestSWOTAgentConfiguration:
                 break
 
         assert swot_call is not None, "SWOT agent was not initialized"
-        assert swot_call.args[0] == settings.LLM_MODEL_PRO, \
-            f"SWOT agent should use LLM_MODEL_PRO, got {swot_call.args[0]}"
+        assert swot_call.args[0] == settings.LLM_MODEL, \
+            f"SWOT agent should use LLM_MODEL, got {swot_call.args[0]}"
 
     @patch('src.infrastructure.adapters.agent_adapter.Agent')
     def test_swot_agent_uses_correct_temperature(self, mock_agent_class):
-        """Verify SWOT agent uses temperature 0.3 for structured output consistency"""
+        """Verify SWOT agent uses temperature 0.2 for structured output consistency"""
         adapter = PydanticAgentAdapter()
 
         # Find the call that initialized swot_risk_agent
@@ -47,13 +47,13 @@ class TestSWOTAgentConfiguration:
         assert model_settings is not None, "SWOT agent should have model_settings"
         # ModelSettings is passed as a dict when mocked
         if isinstance(model_settings, dict):
-            assert model_settings.get('temperature') == 0.3, \
-                f"SWOT agent should use temperature 0.3, got {model_settings.get('temperature')}"
+            assert model_settings.get('temperature') == 0.2, \
+                f"SWOT agent should use temperature 0.2, got {model_settings.get('temperature')}"
         else:
             # ModelSettings object
             assert hasattr(model_settings, 'temperature'), "model_settings should have temperature attribute"
-            assert model_settings.temperature == 0.3, \
-                f"SWOT agent should use temperature 0.3, got {model_settings.temperature}"
+            assert model_settings.temperature == 0.2, \
+                f"SWOT agent should use temperature 0.2, got {model_settings.temperature}"
 
     @patch('src.infrastructure.adapters.agent_adapter.Agent')
     def test_swot_agent_has_retries(self, mock_agent_class):
@@ -74,7 +74,7 @@ class TestSWOTAgentConfiguration:
 
     @patch('src.infrastructure.adapters.agent_adapter.Agent')
     def test_gtm_agent_uses_correct_model(self, mock_agent_class):
-        """Verify GTM agent also uses LLM_MODEL_PRO (same model as SWOT)"""
+        """Verify GTM agent also uses LLM_MODEL (same model as SWOT)"""
         from src.domain.entities import GTMStrategy
         adapter = PydanticAgentAdapter()
 
@@ -87,227 +87,130 @@ class TestSWOTAgentConfiguration:
                 break
 
         assert gtm_call is not None, "GTM agent was not initialized"
-        assert gtm_call.args[0] == settings.LLM_MODEL_PRO, \
-            f"GTM agent should use LLM_MODEL_PRO, got {gtm_call.args[0]}"
+        assert gtm_call.args[0] == settings.LLM_MODEL, \
+            f"GTM agent should use LLM_MODEL, got {gtm_call.args[0]}"
 
 
 class TestSWOTRiskOutputSchema:
     """Schema validation tests for SWOTRiskOutput"""
 
     def test_valid_swot_risk_output(self):
-        """Test that valid SWOTRiskOutput with all fields passes validation"""
+        """Test that valid SWOTRiskOutput with flattened fields passes validation"""
         valid_data = {
-            "swot": {
-                "strengths": ["Strong team", "Unique tech", "Market timing"],
-                "weaknesses": ["No funding", "Small team", "Limited reach"],
-                "opportunities": ["Growing market", "New regulation", "Tech trends"],
-                "threats": ["Competition", "Economic downturn", "Tech changes"]
-            },
-            "risks": [
-                {
-                    "category": "market",
-                    "description": "Market may not adopt the product quickly enough",
-                    "severity": "critical",
-                    "mitigation": "Conduct extensive user research and pilot programs"
-                },
-                {
-                    "category": "technical",
-                    "description": "Core technology may not scale as expected",
-                    "severity": "high",
-                    "mitigation": "Build scalable architecture from day one"
-                },
-                {
-                    "category": "financial",
-                    "description": "Funding may run out before profitability",
-                    "severity": "medium",
-                    "mitigation": "Maintain 18-month runway, plan fundraising early"
-                },
-                {
-                    "category": "execution",
-                    "description": "Team may not execute quickly enough",
-                    "severity": "low",
-                    "mitigation": "Hire experienced team members, use agile methodology"
-                }
+            "strengths": ["Strong team", "Unique tech", "Market timing"],
+            "weaknesses": ["No funding", "Small team", "Limited reach"],
+            "opportunities": ["Growing market", "New regulation", "Tech trends"],
+            "threats": ["Competition", "Economic downturn", "Tech changes"],
+            "risk_categories": ["market", "technical", "financial", "execution"],
+            "risk_descriptions": [
+                "Market may not adopt the product quickly enough",
+                "Core technology may not scale as expected",
+                "Funding may run out before profitability",
+                "Team may not execute quickly enough"
+            ],
+            "risk_severities": ["critical", "high", "medium", "low"],
+            "risk_mitigations": [
+                "Conduct extensive user research and pilot programs",
+                "Build scalable architecture from day one",
+                "Maintain 18-month runway, plan fundraising early",
+                "Hire experienced team members, use agile methodology"
             ]
         }
 
         output = SWOTRiskOutput(**valid_data)
-        assert output.swot.strengths == valid_data["swot"]["strengths"]
-        assert len(output.risks) == 4
-        assert output.risks[0].category == "market"
-        assert output.risks[0].severity == "critical"
+        assert output.strengths == valid_data["strengths"]
+        assert output.weaknesses == valid_data["weaknesses"]
+        assert len(output.risk_categories) == 4
+        assert output.risk_categories[0] == "market"
+        assert output.risk_severities[0] == "critical"
 
     def test_swot_with_minimum_items(self):
-        """Test SWOT with minimum 3 items per quadrant (edge case)"""
+        """Test SWOT with minimum 3 items per quadrant and 4 risks (edge case)"""
         min_data = {
-            "swot": {
-                "strengths": ["S1", "S2", "S3"],
-                "weaknesses": ["W1", "W2", "W3"],
-                "opportunities": ["O1", "O2", "O3"],
-                "threats": ["T1", "T2", "T3"]
-            },
-            "risks": [
-                {
-                    "category": "market",
-                    "description": "Risk 1",
-                    "severity": "high",
-                    "mitigation": "Mitigation 1"
-                },
-                {
-                    "category": "technical",
-                    "description": "Risk 2",
-                    "severity": "medium",
-                    "mitigation": "Mitigation 2"
-                },
-                {
-                    "category": "financial",
-                    "description": "Risk 3",
-                    "severity": "low",
-                    "mitigation": "Mitigation 3"
-                },
-                {
-                    "category": "execution",
-                    "description": "Risk 4",
-                    "severity": "critical",
-                    "mitigation": "Mitigation 4"
-                }
-            ]
+            "strengths": ["S1", "S2", "S3"],
+            "weaknesses": ["W1", "W2", "W3"],
+            "opportunities": ["O1", "O2", "O3"],
+            "threats": ["T1", "T2", "T3"],
+            "risk_categories": ["market", "technical", "financial", "execution"],
+            "risk_descriptions": ["R1", "R2", "R3", "R4"],
+            "risk_severities": ["high", "medium", "low", "critical"],
+            "risk_mitigations": ["M1", "M2", "M3", "M4"]
         }
 
         output = SWOTRiskOutput(**min_data)
-        assert len(output.swot.strengths) == 3
-        assert len(output.risks) == 4
+        assert len(output.strengths) == 3
+        assert len(output.risk_categories) == 4
 
     def test_swot_with_maximum_items(self):
         """Test SWOT with maximum 5 items per quadrant and 7 risks (edge case)"""
         max_data = {
-            "swot": {
-                "strengths": ["S1", "S2", "S3", "S4", "S5"],
-                "weaknesses": ["W1", "W2", "W3", "W4", "W5"],
-                "opportunities": ["O1", "O2", "O3", "O4", "O5"],
-                "threats": ["T1", "T2", "T3", "T4", "T5"]
-            },
-            "risks": [
-                {"category": "market", "description": "R1", "severity": "critical", "mitigation": "M1"},
-                {"category": "technical", "description": "R2", "severity": "critical", "mitigation": "M2"},
-                {"category": "regulatory", "description": "R3", "severity": "high", "mitigation": "M3"},
-                {"category": "competitive", "description": "R4", "severity": "high", "mitigation": "M4"},
-                {"category": "financial", "description": "R5", "severity": "medium", "mitigation": "M5"},
-                {"category": "execution", "description": "R6", "severity": "medium", "mitigation": "M6"},
-                {"category": "market", "description": "R7", "severity": "low", "mitigation": "M7"}
-            ]
+            "strengths": ["S1", "S2", "S3", "S4", "S5"],
+            "weaknesses": ["W1", "W2", "W3", "W4", "W5"],
+            "opportunities": ["O1", "O2", "O3", "O4", "O5"],
+            "threats": ["T1", "T2", "T3", "T4", "T5"],
+            "risk_categories": ["market", "technical", "regulatory", "competitive", "financial", "execution", "market"],
+            "risk_descriptions": ["R1", "R2", "R3", "R4", "R5", "R6", "R7"],
+            "risk_severities": ["critical", "critical", "high", "high", "medium", "medium", "low"],
+            "risk_mitigations": ["M1", "M2", "M3", "M4", "M5", "M6", "M7"]
         }
 
         output = SWOTRiskOutput(**max_data)
-        assert len(output.swot.strengths) == 5
-        assert len(output.risks) == 7
+        assert len(output.strengths) == 5
+        assert len(output.risk_categories) == 7
 
     def test_invalid_risk_category(self):
         """Test that invalid risk category fails validation"""
         invalid_data = {
-            "swot": {
-                "strengths": ["S1", "S2", "S3"],
-                "weaknesses": ["W1", "W2", "W3"],
-                "opportunities": ["O1", "O2", "O3"],
-                "threats": ["T1", "T2", "T3"]
-            },
-            "risks": [
-                {
-                    "category": "invalid_category",  # Invalid
-                    "description": "Risk description",
-                    "severity": "high",
-                    "mitigation": "Mitigation plan"
-                },
-                {
-                    "category": "market",
-                    "description": "Risk 2",
-                    "severity": "medium",
-                    "mitigation": "Mitigation 2"
-                },
-                {
-                    "category": "technical",
-                    "description": "Risk 3",
-                    "severity": "low",
-                    "mitigation": "Mitigation 3"
-                },
-                {
-                    "category": "financial",
-                    "description": "Risk 4",
-                    "severity": "critical",
-                    "mitigation": "Mitigation 4"
-                }
-            ]
+            "strengths": ["S1", "S2", "S3"],
+            "weaknesses": ["W1", "W2", "W3"],
+            "opportunities": ["O1", "O2", "O3"],
+            "threats": ["T1", "T2", "T3"],
+            "risk_categories": ["invalid_category", "market", "technical", "financial"],  # First one invalid
+            "risk_descriptions": ["R1", "R2", "R3", "R4"],
+            "risk_severities": ["high", "medium", "low", "critical"],
+            "risk_mitigations": ["M1", "M2", "M3", "M4"]
         }
 
         with pytest.raises(ValidationError) as exc_info:
             SWOTRiskOutput(**invalid_data)
 
-        assert "category" in str(exc_info.value)
+        assert "risk_categories" in str(exc_info.value)
 
     def test_invalid_risk_severity(self):
         """Test that invalid risk severity fails validation"""
         invalid_data = {
-            "swot": {
-                "strengths": ["S1", "S2", "S3"],
-                "weaknesses": ["W1", "W2", "W3"],
-                "opportunities": ["O1", "O2", "O3"],
-                "threats": ["T1", "T2", "T3"]
-            },
-            "risks": [
-                {
-                    "category": "market",
-                    "description": "Risk description",
-                    "severity": "extreme",  # Invalid
-                    "mitigation": "Mitigation plan"
-                },
-                {
-                    "category": "technical",
-                    "description": "Risk 2",
-                    "severity": "high",
-                    "mitigation": "Mitigation 2"
-                },
-                {
-                    "category": "financial",
-                    "description": "Risk 3",
-                    "severity": "medium",
-                    "mitigation": "Mitigation 3"
-                },
-                {
-                    "category": "execution",
-                    "description": "Risk 4",
-                    "severity": "low",
-                    "mitigation": "Mitigation 4"
-                }
-            ]
+            "strengths": ["S1", "S2", "S3"],
+            "weaknesses": ["W1", "W2", "W3"],
+            "opportunities": ["O1", "O2", "O3"],
+            "threats": ["T1", "T2", "T3"],
+            "risk_categories": ["market", "technical", "financial", "execution"],
+            "risk_descriptions": ["R1", "R2", "R3", "R4"],
+            "risk_severities": ["extreme", "high", "medium", "low"],  # First one invalid
+            "risk_mitigations": ["M1", "M2", "M3", "M4"]
         }
 
         with pytest.raises(ValidationError) as exc_info:
             SWOTRiskOutput(**invalid_data)
 
-        assert "severity" in str(exc_info.value)
+        assert "risk_severities" in str(exc_info.value)
 
     def test_empty_swot_quadrant_fails(self):
-        """Test that empty SWOT quadrant fails validation"""
+        """Test that empty SWOT quadrant fails validation with min_length=3"""
         invalid_data = {
-            "swot": {
-                "strengths": [],  # Empty
-                "weaknesses": ["W1", "W2", "W3"],
-                "opportunities": ["O1", "O2", "O3"],
-                "threats": ["T1", "T2", "T3"]
-            },
-            "risks": [
-                {"category": "market", "description": "R1", "severity": "high", "mitigation": "M1"},
-                {"category": "technical", "description": "R2", "severity": "medium", "mitigation": "M2"},
-                {"category": "financial", "description": "R3", "severity": "low", "mitigation": "M3"},
-                {"category": "execution", "description": "R4", "severity": "critical", "mitigation": "M4"}
-            ]
+            "strengths": [],  # Empty - should fail min_length=3
+            "weaknesses": ["W1", "W2", "W3"],
+            "opportunities": ["O1", "O2", "O3"],
+            "threats": ["T1", "T2", "T3"],
+            "risk_categories": ["market", "technical", "financial", "execution"],
+            "risk_descriptions": ["R1", "R2", "R3", "R4"],
+            "risk_severities": ["high", "medium", "low", "critical"],
+            "risk_mitigations": ["M1", "M2", "M3", "M4"]
         }
 
-        # Note: The schema doesn't enforce min_items validation at the Pydantic level
-        # This is validated by the prompt and AI model behavior
-        # We'll test the actual behavior in integration tests
-        output = SWOTRiskOutput(**invalid_data)
-        assert len(output.swot.strengths) == 0  # Technically valid at schema level
+        with pytest.raises(ValidationError) as exc_info:
+            SWOTRiskOutput(**invalid_data)
+
+        assert "strengths" in str(exc_info.value)
 
     def test_missing_risk_field_fails(self):
         """Test that missing required risk field fails validation"""
@@ -360,21 +263,17 @@ class TestSWOTAgentBehavior:
         """Test that SWOT agent returns all 4 quadrants with 3-5 items each"""
         adapter = PydanticAgentAdapter()
 
-        # Mock the agent's run method to return valid output
+        # Mock the agent's run method to return flattened output
         mock_result = MagicMock()
         mock_result.output = SWOTRiskOutput(
-            swot=SWOTAnalysis(
-                strengths=["Strength 1", "Strength 2", "Strength 3", "Strength 4"],
-                weaknesses=["Weakness 1", "Weakness 2", "Weakness 3"],
-                opportunities=["Opportunity 1", "Opportunity 2", "Opportunity 3", "Opportunity 4"],
-                threats=["Threat 1", "Threat 2", "Threat 3"]
-            ),
-            risks=[
-                RiskFactor(category="market", description="Market risk", severity="critical", mitigation="Mitigation 1"),
-                RiskFactor(category="technical", description="Tech risk", severity="high", mitigation="Mitigation 2"),
-                RiskFactor(category="financial", description="Financial risk", severity="medium", mitigation="Mitigation 3"),
-                RiskFactor(category="execution", description="Execution risk", severity="low", mitigation="Mitigation 4")
-            ]
+            strengths=["Strength 1", "Strength 2", "Strength 3", "Strength 4"],
+            weaknesses=["Weakness 1", "Weakness 2", "Weakness 3"],
+            opportunities=["Opportunity 1", "Opportunity 2", "Opportunity 3", "Opportunity 4"],
+            threats=["Threat 1", "Threat 2", "Threat 3"],
+            risk_categories=["market", "technical", "financial", "execution"],
+            risk_descriptions=["Market risk", "Tech risk", "Financial risk", "Execution risk"],
+            risk_severities=["critical", "high", "medium", "low"],
+            risk_mitigations=["Mitigation 1", "Mitigation 2", "Mitigation 3", "Mitigation 4"]
         )
 
         adapter.swot_risk_agent.run = AsyncMock(return_value=mock_result)
@@ -384,7 +283,7 @@ class TestSWOTAgentBehavior:
             "Strategic input from previous agent"
         )
 
-        # Verify all quadrants are populated (result is dict but swot is Pydantic object)
+        # Verify all quadrants are populated (converted back to nested structure)
         assert len(result["swot"].strengths) >= 3
         assert len(result["swot"].weaknesses) >= 3
         assert len(result["swot"].opportunities) >= 3
@@ -397,20 +296,14 @@ class TestSWOTAgentBehavior:
 
         mock_result = MagicMock()
         mock_result.output = SWOTRiskOutput(
-            swot=SWOTAnalysis(
-                strengths=["S1", "S2", "S3", "S4"],
-                weaknesses=["W1", "W2", "W3"],
-                opportunities=["O1", "O2", "O3", "O4"],
-                threats=["T1", "T2", "T3"]
-            ),
-            risks=[
-                RiskFactor(category="market", description="R1", severity="critical", mitigation="M1"),
-                RiskFactor(category="technical", description="R2", severity="critical", mitigation="M2"),
-                RiskFactor(category="regulatory", description="R3", severity="high", mitigation="M3"),
-                RiskFactor(category="competitive", description="R4", severity="high", mitigation="M4"),
-                RiskFactor(category="financial", description="R5", severity="medium", mitigation="M5"),
-                RiskFactor(category="execution", description="R6", severity="low", mitigation="M6")
-            ]
+            strengths=["S1", "S2", "S3", "S4"],
+            weaknesses=["W1", "W2", "W3"],
+            opportunities=["O1", "O2", "O3", "O4"],
+            threats=["T1", "T2", "T3"],
+            risk_categories=["market", "technical", "regulatory", "competitive", "financial", "execution"],
+            risk_descriptions=["R1", "R2", "R3", "R4", "R5", "R6"],
+            risk_severities=["critical", "critical", "high", "high", "medium", "low"],
+            risk_mitigations=["M1", "M2", "M3", "M4", "M5", "M6"]
         )
 
         adapter.swot_risk_agent.run = AsyncMock(return_value=mock_result)
@@ -431,18 +324,14 @@ class TestSWOTAgentBehavior:
 
         mock_result = MagicMock()
         mock_result.output = SWOTRiskOutput(
-            swot=SWOTAnalysis(
-                strengths=["S1", "S2", "S3"],
-                weaknesses=["W1", "W2", "W3"],
-                opportunities=["O1", "O2", "O3"],
-                threats=["T1", "T2", "T3"]
-            ),
-            risks=[
-                RiskFactor(category="market", description="R1", severity="high", mitigation="M1"),
-                RiskFactor(category="technical", description="R2", severity="medium", mitigation="M2"),
-                RiskFactor(category="regulatory", description="R3", severity="low", mitigation="M3"),
-                RiskFactor(category="financial", description="R4", severity="critical", mitigation="M4")
-            ]
+            strengths=["S1", "S2", "S3"],
+            weaknesses=["W1", "W2", "W3"],
+            opportunities=["O1", "O2", "O3"],
+            threats=["T1", "T2", "T3"],
+            risk_categories=["market", "technical", "regulatory", "financial"],
+            risk_descriptions=["R1", "R2", "R3", "R4"],
+            risk_severities=["high", "medium", "low", "critical"],
+            risk_mitigations=["M1", "M2", "M3", "M4"]
         )
 
         adapter.swot_risk_agent.run = AsyncMock(return_value=mock_result)
@@ -462,18 +351,14 @@ class TestSWOTAgentBehavior:
 
         mock_result = MagicMock()
         mock_result.output = SWOTRiskOutput(
-            swot=SWOTAnalysis(
-                strengths=["S1", "S2", "S3"],
-                weaknesses=["W1", "W2", "W3"],
-                opportunities=["O1", "O2", "O3"],
-                threats=["T1", "T2", "T3"]
-            ),
-            risks=[
-                RiskFactor(category="market", description="R1", severity="critical", mitigation="M1"),
-                RiskFactor(category="technical", description="R2", severity="high", mitigation="M2"),
-                RiskFactor(category="financial", description="R3", severity="medium", mitigation="M3"),
-                RiskFactor(category="execution", description="R4", severity="low", mitigation="M4")
-            ]
+            strengths=["S1", "S2", "S3"],
+            weaknesses=["W1", "W2", "W3"],
+            opportunities=["O1", "O2", "O3"],
+            threats=["T1", "T2", "T3"],
+            risk_categories=["market", "technical", "financial", "execution"],
+            risk_descriptions=["R1", "R2", "R3", "R4"],
+            risk_severities=["critical", "high", "medium", "low"],
+            risk_mitigations=["M1", "M2", "M3", "M4"]
         )
 
         adapter.swot_risk_agent.run = AsyncMock(return_value=mock_result)

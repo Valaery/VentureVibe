@@ -34,20 +34,20 @@ class AgentThought(BaseModel):
 
 
 class MarketSizing(BaseModel):
-    tam_usd_billion: float
-    sam_usd_billion: float
-    som_usd_million: float
-    sizing_methodology: Literal["top_down", "bottom_up", "hybrid"]
-    tam_source_basis: str
-    growth_rate_pct: Optional[float] = None
+    tam_usd_billion: float = Field(description="Total Addressable Market in USD Billions")
+    sam_usd_billion: float = Field(description="Serviceable Addressable Market in USD Billions")
+    som_usd_million: float = Field(description="Serviceable Obtainable Market (3-year estimate) in USD Millions")
+    sizing_methodology: Literal["top_down", "bottom_up", "hybrid"] = Field(description="The approach used to calculate numbers")
+    tam_source_basis: str = Field(description="The source or rationale for the TAM figure")
+    growth_rate_pct: Optional[float] = Field(default=None, description="Projected annual market growth rate percentage")
 
 
 class Competitor(BaseModel):
-    name: str
-    positioning: str
-    primary_weakness: str
-    estimated_funding_usd_million: Optional[float] = None
-    business_model: str
+    name: str = Field(description="Real company name")
+    positioning: str = Field(description="One-sentence value proposition")
+    primary_weakness: str = Field(description="Specific exploitabe gap or customer pain point they ignore")
+    estimated_funding_usd_million: Optional[float] = Field(default=0.0, description="Total funding raised in USD Millions. Use 0.0 if unknown.")
+    business_model: str = Field(description="The revenue model (e.g. B2B SaaS, Marketplace)")
 
 
 class CompetitiveAnalysis(BaseModel):
@@ -65,10 +65,10 @@ class SWOTAnalysis(BaseModel):
 
 
 class RiskFactor(BaseModel):
-    category: Literal["market", "technical", "regulatory", "competitive", "financial", "execution"]
-    description: str
-    severity: Literal["low", "medium", "high", "critical"]
-    mitigation: str
+    category: Literal["market", "technical", "regulatory", "competitive", "financial", "execution"] = Field(description="The source area of the risk")
+    description: str = Field(description="Detailed explanation of the risk event and impact")
+    severity: Literal["low", "medium", "high", "critical"] = Field(description="Impact level of the risk")
+    mitigation: str = Field(description="Proposed strategy to manage or avoid the risk")
 
 
 class GTMStrategy(BaseModel):

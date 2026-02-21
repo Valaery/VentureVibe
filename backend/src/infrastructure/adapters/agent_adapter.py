@@ -29,8 +29,18 @@ class AnalystOutput(BaseModel):
 
 
 class SWOTRiskOutput(BaseModel):
-    swot: SWOTAnalysis
-    risks: List[RiskFactor] = Field(description="4-7 risks sorted by severity (critical first)")
+    """Flattened schema to avoid nested object issues with Gemini models"""
+    # SWOT quadrants as separate list fields
+    strengths: List[str] = Field(min_length=3, max_length=5, description="3-5 internal positive factors")
+    weaknesses: List[str] = Field(min_length=3, max_length=5, description="3-5 internal constraints")
+    opportunities: List[str] = Field(min_length=3, max_length=5, description="3-5 external positive trends")
+    threats: List[str] = Field(min_length=3, max_length=5, description="3-5 external negative factors")
+
+    # Risk factors as parallel lists (4-7 items each, sorted by severity)
+    risk_categories: List[Literal["market", "technical", "regulatory", "competitive", "financial", "execution"]] = Field(min_length=4, max_length=7, description="Risk source areas")
+    risk_descriptions: List[str] = Field(min_length=4, max_length=7, description="Detailed risk scenarios")
+    risk_severities: List[Literal["low", "medium", "high", "critical"]] = Field(min_length=4, max_length=7, description="Impact levels (sorted: critical first)")
+    risk_mitigations: List[str] = Field(min_length=4, max_length=7, description="Concrete mitigation strategies")
 
 
 # System prompts for each agent
@@ -277,73 +287,56 @@ CRITICAL FIELD-LEVEL REQUIREMENTS:
    - Cover at least 3 different risk categories
    - Every critical/high risk MUST have a detailed mitigation plan
 
-CRITICAL: Output ONLY the raw JSON. No preamble, no post-text, no "thinking" blocks.
+CRITICAL OUTPUT FORMAT:
+- Output ONLY valid JSON with FLAT FIELDS - no preamble, no post-text, no "thinking" blocks
+- Use separate array fields for SWOT quadrants: "strengths", "weaknesses", "opportunities", "threats"
+- Use parallel arrays for risks: "risk_categories", "risk_descriptions", "risk_severities", "risk_mitigations"
+- All arrays at the same index represent one risk item
+- Example: risk_categories[0], risk_descriptions[0], risk_severities[0], risk_mitigations[0] = first risk
 
 COMPLETE REALISTIC EXAMPLE (dental clinic automation SaaS):
 {
-  "swot": {
-    "strengths": [
-      "Founder has 8 years experience as dental practice manager, deep domain expertise in workflow pain points",
-      "Pre-built integration with top 3 dental practice management systems (Dentrix, Eaglesoft, Open Dental) covering 60% of US market",
-      "Proprietary patient communication templates optimized for 12% higher appointment show rates vs industry standard",
-      "Early access to OpenAI healthcare API beta, 6-month head start on HIPAA-compliant AI features"
-    ],
-    "weaknesses": [
-      "Solo technical founder, no co-founder, engineering velocity capped at 60% of funded competitors",
-      "Zero existing customer base, need to build trust in regulated healthcare vertical from scratch",
-      "Limited runway (18 months), cannot afford long enterprise sales cycles typical in healthcare",
-      "No compliance team, relies on external consultant for HIPAA audit readiness ($8K/month burn)"
-    ],
-    "opportunities": [
-      "Dental industry projected 6.1% CAGR through 2028, private equity rolling up practices creating demand for standardized ops tools",
-      "Labor shortage in dental hygienists (23% shortage per ADA 2025 report) driving automation ROI up 40%",
-      "Recent CMS rule change (Jan 2026) incentivizing preventive care, automated recall systems now reimbursable",
-      "Incumbents focused on large DSOs (50+ locations), underserved mid-market (5-20 locations) represents 34% of revenue opportunity"
-    ],
-    "threats": [
-      "Weave Communications (acquired by Vista Equity 2024, $150M funding) launched AI patient engagement Nov 2025",
-      "Open Dental announced native automation features Q1 2026 roadmap, could commoditize core value prop",
-      "Economic downturn reducing elective dental procedures 18% YoY, practices cutting software spend",
-      "HIPAA enforcement increased 340% in 2025, one violation could end company before product-market fit"
-    ]
-  },
-  "risks": [
-    {
-      "category": "regulatory",
-      "description": "Product handles protected health information (PHI) and requires HIPAA compliance. A single data breach or compliance violation could result in $50K+ fines, loss of all customers, and potential criminal liability. Current implementation relies on external audit ($8K/month) without in-house expertise.",
-      "severity": "critical",
-      "mitigation": "Hire fractional healthcare compliance officer (0.5 FTE, $6K/month) by month 2. Implement automated compliance monitoring (Vanta Health, $500/month). Obtain cyber insurance with $2M PHI breach coverage. Allocate 15% of engineering budget to security infrastructure."
-    },
-    {
-      "category": "competitive",
-      "description": "Open Dental (40% market share) announced native automation features for Q1 2026. If they execute, integration moat disappears and product becomes redundant. Historical precedent: Practice management systems killed 4 standalone scheduling tools between 2019-2023.",
-      "severity": "critical",
-      "mitigation": "Pivot to workflow orchestration across multiple systems (not just scheduling). Build features Open Dental cannot (cross-practice analytics for DSOs). Secure 50+ paid customers by Dec 2026 to demonstrate differentiation. Plan for potential acquisition by PM system as exit."
-    },
-    {
-      "category": "market",
-      "description": "Economic downturn reduced elective dental procedures 18% in 2025. Practices are cutting discretionary software spend. If recession deepens, target customer segment (5-20 location groups) may freeze all new tooling purchases for 12-18 months, killing growth.",
-      "severity": "high",
-      "mitigation": "Position as cost-reduction tool (saves 15 admin hours/week = $31K/year) not revenue growth tool. Offer 3-month ROI guarantee with money-back clause. Target PE-backed groups (have capital) over independent practices. Build recession-proof use case (patient retention) as primary value prop."
-    },
-    {
-      "category": "technical",
-      "description": "Core AI features depend on OpenAI API. If API costs increase 3x (precedent: happened to GPT-4 early access partners in 2023) or access is restricted, unit economics break. Currently $47 API cost per customer per month vs $99 pricing = 47% gross margin, but 3x cost increase = negative margin.",
-      "severity": "high",
-      "mitigation": "Build LLM abstraction layer supporting 3 providers (OpenAI, Anthropic, Gemini) by month 4. Allocate $2K/month to test alternative models. Implement aggressive caching (target 60% cache hit rate). Design pricing model with usage-based overage after 200 patients/month to cap exposure."
-    },
-    {
-      "category": "execution",
-      "description": "Solo technical founder managing product, engineering, sales, and compliance. Burnout risk high, velocity is 40% of team-based competitors. Key features delayed 6+ weeks regularly. Cannot hire senior eng until Series A, but need traction to raise Series A (chicken-egg problem).",
-      "severity": "medium",
-      "mitigation": "Hire senior product-focused engineer as contractor (part-time, $8K/month) by month 3 to own integrations. Use no-code tools (Retool for admin, n8n for workflows) to reduce eng surface area by 30%. Outsource compliance monitoring and customer success to fractional roles. Focus founder time on only core AI differentiation."
-    },
-    {
-      "category": "financial",
-      "description": "18-month runway with $320 CAC and 9-month payback period leaves only 6 months to reach profitability or raise next round. If sales cycle extends to 4 months (common in healthcare), can only afford 15 failed deals before runway pressure forces down-round or shutdown.",
-      "severity": "medium",
-      "mitigation": "Switch to product-led growth model with self-serve onboarding for practices under 10 locations (70% of pipeline). Target CAC under $200 via organic content (dental practice management Facebook groups, conference talks). Extend runway via $100K in dilutive revenue-based financing if needed by month 12."
-    }
+  "strengths": [
+    "Founder has 8 years experience as dental practice manager, deep domain expertise in workflow pain points",
+    "Pre-built integration with top 3 dental practice management systems (Dentrix, Eaglesoft, Open Dental) covering 60% of US market",
+    "Proprietary patient communication templates optimized for 12% higher appointment show rates vs industry standard",
+    "Early access to OpenAI healthcare API beta, 6-month head start on HIPAA-compliant AI features"
+  ],
+  "weaknesses": [
+    "Solo technical founder, no co-founder, engineering velocity capped at 60% of funded competitors",
+    "Zero existing customer base, need to build trust in regulated healthcare vertical from scratch",
+    "Limited runway (18 months), cannot afford long enterprise sales cycles typical in healthcare",
+    "No compliance team, relies on external consultant for HIPAA audit readiness ($8K/month burn)"
+  ],
+  "opportunities": [
+    "Dental industry projected 6.1% CAGR through 2028, private equity rolling up practices creating demand for standardized ops tools",
+    "Labor shortage in dental hygienists (23% shortage per ADA 2025 report) driving automation ROI up 40%",
+    "Recent CMS rule change (Jan 2026) incentivizing preventive care, automated recall systems now reimbursable",
+    "Incumbents focused on large DSOs (50+ locations), underserved mid-market (5-20 locations) represents 34% of revenue opportunity"
+  ],
+  "threats": [
+    "Weave Communications (acquired by Vista Equity 2024, $150M funding) launched AI patient engagement Nov 2025",
+    "Open Dental announced native automation features Q1 2026 roadmap, could commoditize core value prop",
+    "Economic downturn reducing elective dental procedures 18% YoY, practices cutting software spend",
+    "HIPAA enforcement increased 340% in 2025, one violation could end company before product-market fit"
+  ],
+  "risk_categories": ["regulatory", "competitive", "market", "technical", "execution", "financial"],
+  "risk_descriptions": [
+    "Product handles protected health information (PHI) and requires HIPAA compliance. A single data breach or compliance violation could result in $50K+ fines, loss of all customers, and potential criminal liability. Current implementation relies on external audit ($8K/month) without in-house expertise.",
+    "Open Dental (40% market share) announced native automation features for Q1 2026. If they execute, integration moat disappears and product becomes redundant. Historical precedent: Practice management systems killed 4 standalone scheduling tools between 2019-2023.",
+    "Economic downturn reduced elective dental procedures 18% in 2025. Practices are cutting discretionary software spend. If recession deepens, target customer segment (5-20 location groups) may freeze all new tooling purchases for 12-18 months, killing growth.",
+    "Core AI features depend on OpenAI API. If API costs increase 3x (precedent: happened to GPT-4 early access partners in 2023) or access is restricted, unit economics break. Currently $47 API cost per customer per month vs $99 pricing = 47% gross margin, but 3x cost increase = negative margin.",
+    "Solo technical founder managing product, engineering, sales, and compliance. Burnout risk high, velocity is 40% of team-based competitors. Key features delayed 6+ weeks regularly. Cannot hire senior eng until Series A, but need traction to raise Series A (chicken-egg problem).",
+    "18-month runway with $320 CAC and 9-month payback period leaves only 6 months to reach profitability or raise next round. If sales cycle extends to 4 months (common in healthcare), can only afford 15 failed deals before runway pressure forces down-round or shutdown."
+  ],
+  "risk_severities": ["critical", "critical", "high", "high", "medium", "medium"],
+  "risk_mitigations": [
+    "Hire fractional healthcare compliance officer (0.5 FTE, $6K/month) by month 2. Implement automated compliance monitoring (Vanta Health, $500/month). Obtain cyber insurance with $2M PHI breach coverage. Allocate 15% of engineering budget to security infrastructure.",
+    "Pivot to workflow orchestration across multiple systems (not just scheduling). Build features Open Dental cannot (cross-practice analytics for DSOs). Secure 50+ paid customers by Dec 2026 to demonstrate differentiation. Plan for potential acquisition by PM system as exit.",
+    "Position as cost-reduction tool (saves 15 admin hours/week = $31K/year) not revenue growth tool. Offer 3-month ROI guarantee with money-back clause. Target PE-backed groups (have capital) over independent practices. Build recession-proof use case (patient retention) as primary value prop.",
+    "Build LLM abstraction layer supporting 3 providers (OpenAI, Anthropic, Gemini) by month 4. Allocate $2K/month to test alternative models. Implement aggressive caching (target 60% cache hit rate). Design pricing model with usage-based overage after 200 patients/month to cap exposure.",
+    "Hire senior product-focused engineer as contractor (part-time, $8K/month) by month 3 to own integrations. Use no-code tools (Retool for admin, n8n for workflows) to reduce eng surface area by 30%. Outsource compliance monitoring and customer success to fractional roles. Focus founder time on only core AI differentiation.",
+    "Switch to product-led growth model with self-serve onboarding for practices under 10 locations (70% of pipeline). Target CAC under $200 via organic content (dental practice management Facebook groups, conference talks). Extend runway via $100K in dilutive revenue-based financing if needed by month 12."
   ]
 }
 """
@@ -399,7 +392,7 @@ class PydanticAgentAdapter(AgentService):
         # Model settings
         flash3_settings = ModelSettings(temperature=1.0)
         tool_settings = ModelSettings(temperature=0.7)
-        swot_settings = ModelSettings(temperature=0.3)  # For SWOT and GTM agents
+        swot_settings = ModelSettings(temperature=0.2)  # For SWOT and GTM agents - very low for strict structure
         pro3_settings = ModelSettings(temperature=1.0)
 
         # Build search tools
@@ -422,7 +415,7 @@ class PydanticAgentAdapter(AgentService):
         )
 
         self.swot_risk_agent = Agent(
-            settings.LLM_MODEL_PRO,
+            settings.LLM_MODEL,  # Use Flash like competitor_agent - proven to work with nested objects
             output_type=SWOTRiskOutput,
             model_settings=swot_settings,
             system_prompt=SWOT_RISK_PROMPT,
@@ -430,7 +423,7 @@ class PydanticAgentAdapter(AgentService):
         )
 
         self.gtm_agent = Agent(
-            settings.LLM_MODEL_PRO,
+            settings.LLM_MODEL,  # Use Flash like competitor_agent
             output_type=GTMStrategy,
             model_settings=swot_settings,
             system_prompt=GTM_PROMPT,
@@ -542,9 +535,32 @@ Conduct a comprehensive SWOT analysis and identify key risk factors with mitigat
 
             result = await self.swot_risk_agent.run(prompt)
             logger.info("SWOT & Risk Analyst agent completed successfully")
+
+            # Convert flattened output back to nested structure
+            flat = result.output
+
+            # Reconstruct SWOT analysis from flat fields
+            swot = SWOTAnalysis(
+                strengths=flat.strengths,
+                weaknesses=flat.weaknesses,
+                opportunities=flat.opportunities,
+                threats=flat.threats
+            )
+
+            # Reconstruct risk factors from parallel lists
+            risks = [
+                RiskFactor(
+                    category=flat.risk_categories[i],
+                    description=flat.risk_descriptions[i],
+                    severity=flat.risk_severities[i],
+                    mitigation=flat.risk_mitigations[i]
+                )
+                for i in range(len(flat.risk_categories))
+            ]
+
             return {
-                "swot": result.output.swot,
-                "risks": result.output.risks
+                "swot": swot,
+                "risks": risks
             }
         except Exception as e:
             logger.error(f"SWOT & Risk Analyst agent failed: {type(e).__name__}: {str(e)}", exc_info=True)

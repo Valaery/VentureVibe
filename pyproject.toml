@@ -11,7 +11,7 @@ python = "^3.12"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 motor = "*"
-pydantic-ai = {extras = ["tavily", "duckduckgo"], version = "*"}
+pydantic-ai = "^1.62.0"
 logfire = {extras = ["fastapi"], version = "^4.16.0"}
 python-dotenv = "*"
 openai = "*"
@@ -20,6 +20,8 @@ passlib = {extras = ["bcrypt"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
 python-multipart = "*"
 argon2-cffi = "^25.1.0"
+tavily-python = "^0.7.21"
+ddgs = "^9.10.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
