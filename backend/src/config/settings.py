@@ -17,11 +17,13 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_BASE_URL: str = "https://openrouter.ai/api/v1"
-    # Tool-using agents (market sizing, competitor) — stable multi-turn tool use via OpenRouter
+    # Tool-using agents (market sizing, competitor)
     LLM_MODEL: str = "openai:google/gemini-3-flash-preview"
     # Reasoning-only agents (strategist, swot, gtm) — superior reasoning, no thought-signature issue
     LLM_MODEL_FLASH3: str = "openai:google/gemini-3-flash-preview"
-    # Analyst / synthesizer — most critical agent, max reasoning ceiling
+    # Gemini 3.0 Pro for structured reasoning tasks (SWOT, GTM)
+    LLM_MODEL_PRO: str = "openai:google/gemini-3-pro-preview"
+    # Analyst / synthesizer ONLY — most critical agent, max reasoning ceiling
     LLM_MODEL_PRO3: str = "openai:google/gemini-3.1-pro-preview"
     # Tavily API key for web search (falls back to DuckDuckGo if not set)
     TAVILY_API_KEY: Optional[str] = None

@@ -1,9 +1,9 @@
-# Test Validation Status — Pipeline Enhancement Feature
+# Test Validation Status — VentureVibe Backend
 
-**Feature**: Pipeline enhancement with 6-agent architecture and expanded domain models
-**Branch**: `.trees/pipeline-enhancement/`
-**Test Coverage Date**: 2026-02-20
-**Author**: Backend Test Engineer (Claude Sonnet 4.6)
+**Project**: VentureVibe AI-powered product validation platform
+**Latest Update**: SWOT & Risk Agent Reliability Fix (Issue #1)
+**Test Coverage Date**: 2026-02-21
+**Author**: Backend Test Engineer (Claude Sonnet 4.5)
 
 ---
 
@@ -14,10 +14,12 @@
 | Domain Entities | `test_entities.py` | 50+ tests | ✅ Complete | 100% |
 | Workflow Service | `test_workflow_service.py` | 18 tests | ✅ Complete | 100% |
 | Web DTOs/Schemas | `test_schemas.py` | 35+ tests | ✅ Complete | 100% |
+| Agent Adapter Config | `infrastructure/adapters/test_agent_adapter.py` | 17 tests | ✅ Complete | SWOT config |
+| SWOT Reliability | `infrastructure/adapters/test_swot_agent_reliability.py` | 5 tests (20 runs) | ✅ Complete | Integration |
 
-**Total Tests Written**: 103+
+**Total Tests Written**: 125+
 **All Tests Executable**: Yes (pytest + pytest-asyncio)
-**External Dependencies Mocked**: Yes (no real API calls, no MongoDB)
+**External Dependencies Mocked**: Unit tests fully mocked, reliability tests use real API
 
 ---
 
@@ -266,14 +268,101 @@ All dependencies already present in `pyproject.toml`.
 
 ---
 
+### 4. Agent Adapter Configuration (`test_agent_adapter.py`)
+
+**Purpose**: Test PydanticAgentAdapter configuration, SWOT agent settings, and SWOTRiskOutput schema validation.
+
+#### Coverage by Test Class
+
+**TestSWOTAgentConfiguration (4 tests)**
+- ✅ SWOT agent uses correct model (`LLM_MODEL_PRO` = Gemini 3.0 Pro)
+- ✅ SWOT agent uses correct temperature (0.3 for structured output)
+- ✅ SWOT agent configured with 5 retries
+- ✅ GTM agent also uses `LLM_MODEL_PRO` (same model as SWOT)
+
+**TestSWOTRiskOutputSchema (8 tests)**
+- ✅ Valid SWOTRiskOutput with all fields passes validation
+- ✅ SWOT with minimum 3 items per quadrant (edge case)
+- ✅ SWOT with maximum 5 items per quadrant and 7 risks (edge case)
+- ✅ Invalid risk category rejected
+- ✅ Invalid risk severity rejected
+- ✅ Empty SWOT quadrant validation (schema-level)
+- ✅ Missing risk field (mitigation) rejected
+- ✅ Pydantic ValidationError properly raised
+
+**TestSWOTAgentBehavior (5 tests)**
+- ✅ SWOT agent returns all 4 quadrants populated (3-5 items each)
+- ✅ SWOT agent returns valid risk count (4-7 risks)
+- ✅ All risk categories are valid Literals (market, technical, regulatory, competitive, financial, execution)
+- ✅ All risk severities are valid Literals (low, medium, high, critical)
+- ✅ Mocked agent responses properly validated
+
+**Key Test Patterns**:
+- Agent configuration tested via `unittest.mock.patch`
+- Schema validation uses Pydantic `ValidationError` assertions
+- Integration tests mock agent responses with `AsyncMock`
+- Edge cases tested (min/max items, invalid Literals)
+
+---
+
+### 5. SWOT Agent Reliability (`test_swot_agent_reliability.py`)
+
+**Purpose**: Validate SWOT agent reliability with real API calls across diverse product ideas.
+
+**Target**: <5% error rate (≥19 successful runs out of 20)
+
+#### Coverage by Test
+
+**TestSWOTAgentReliability**
+
+**Main Reliability Test (1 test, 20 API calls)**
+- ✅ 20 diverse product ideas spanning:
+  - Spanish language input (regression test for issue #1990)
+  - Highly technical products (blockchain, AI/ML, biotech)
+  - Non-technical consumer products
+  - Vague/underdeveloped ideas
+  - Extremely detailed specifications
+  - Regulated industries (healthcare, fintech)
+  - Social impact / climate tech
+  - Local services / marketplaces / gaming
+- ✅ Validates SWOT quadrants have ≥3 items each
+- ✅ Validates risks count (4-7)
+- ✅ Validates risk categories are valid Literals
+- ✅ Validates risk severities are valid Literals
+- ✅ Validates severity sorting (critical → high → medium → low)
+- ✅ Logs all failures with error details
+- ✅ Calculates success rate and error rate metrics
+
+**Specific Scenario Tests (4 tests)**
+- ✅ Spanish language input (Plataforma de automatización dental)
+- ✅ Vague input ("An app to help people be more productive")
+- ✅ Highly technical input (Blockchain supply chain with zero-knowledge proofs)
+- ✅ Detailed specification (Code review platform with full tech stack)
+
+**Test Configuration**:
+- Marked as `@pytest.mark.slow` (20 API calls)
+- Uses real PydanticAgentAdapter instance
+- Makes actual API calls to Gemini 3.0 Pro
+- Requires `OPENAI_API_KEY` environment variable
+- Extensive logging for debugging failures
+
+**Success Criteria**:
+- Error rate < 5% (≥19 successful runs)
+- All SWOT quadrants populated
+- Risks properly sorted by severity
+- Valid category and severity Literals
+- Meaningful descriptions and mitigations
+
+---
+
 ## Missing Tests (Future Work)
 
 The following are **NOT** tested in this suite (separate test files required):
 
-1. **Agent Adapter (`agent_adapter.py`)**
-   - Requires integration tests with real/mocked Pydantic AI agents
-   - Tool usage (Tavily/DuckDuckGo) needs separate testing
-   - Model selection logic per agent
+1. **Agent Adapter Tool Usage**
+   - Tavily/DuckDuckGo search tool integration
+   - Market sizing agent web search behavior
+   - Competitor agent web search behavior
 
 2. **API Endpoints (`api.py`)**
    - Already covered in `test_api.py` (needs updating for new schema)
@@ -304,30 +393,40 @@ The following are **NOT** tested in this suite (separate test files required):
 
 ## Validation Sign-Off
 
-**Tests Written By**: Backend Test Engineer (Claude Sonnet 4.6)
-**Date**: 2026-02-20
-**Status**: ✅ **COMPLETE — All unit tests implemented and ready for execution**
+**Tests Written By**: Claude Sonnet 4.5
+**Date**: 2026-02-21
+**Status**: ✅ **COMPLETE — All tests implemented for SWOT agent reliability fix**
+
+**Recent Updates**:
+- ✅ Added agent adapter configuration tests (17 tests)
+- ✅ Added SWOT reliability tests with 20 diverse product ideas
+- ✅ Tests validate Gemini 3.0 Pro model switch and temperature 0.3 setting
+- ✅ Comprehensive schema validation for SWOTRiskOutput
 
 **Next Steps**:
-1. Run `pytest tests/` to validate all tests pass
-2. Run `pytest --cov=src --cov-report=html` to generate coverage report
-3. Review coverage report for any gaps
-4. Update `test_api.py` to test new ResearchResponse schema fields
-5. Plan integration tests for agent adapter and repositories
+1. Run `pytest tests/infrastructure/adapters/test_agent_adapter.py -v` to validate configuration tests
+2. Run `pytest tests/infrastructure/adapters/test_swot_agent_reliability.py::TestSWOTAgentReliability::test_swot_agent_20_run_reliability -v --log-cli-level=INFO` to validate reliability (requires API key)
+3. Monitor Logfire for production error rates after deployment
+4. Run full test suite: `pytest tests/` to ensure no regressions
+5. Generate coverage report: `pytest --cov=src --cov-report=html`
 
 ---
 
 ## Appendix: Test File Structure
 
 ```
-.trees/pipeline-enhancement/backend/tests/
-├── conftest.py                    # Existing fixtures (client, mock repos)
-├── test_api.py                    # Existing API endpoint tests
-├── test_entities.py               # NEW: Domain entity tests (50+ tests)
-├── test_workflow_service.py       # NEW: Workflow orchestration tests (18 tests)
-├── test_schemas.py                # NEW: DTO/schema tests (35+ tests)
-└── VALIDATION_STATUS.md           # This file
+backend/tests/
+├── conftest.py                                   # Existing fixtures (client, mock repos)
+├── test_api.py                                   # Existing API endpoint tests
+├── test_entities.py                              # Domain entity tests (50+ tests)
+├── test_workflow_service.py                      # Workflow orchestration tests (18 tests)
+├── test_schemas.py                               # DTO/schema tests (35+ tests)
+├── infrastructure/
+│   └── adapters/
+│       ├── test_agent_adapter.py                 # NEW: Agent config & schema tests (17 tests)
+│       └── test_swot_agent_reliability.py        # NEW: SWOT reliability tests (5 tests, 20 runs)
+└── VALIDATION_STATUS.md                          # This file
 ```
 
-**Total Lines of Test Code**: ~1,500 lines
+**Total Lines of Test Code**: ~2,100 lines
 **Test-to-Code Ratio**: ~3:1 (comprehensive coverage)
