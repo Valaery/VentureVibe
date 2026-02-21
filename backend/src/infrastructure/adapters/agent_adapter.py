@@ -283,28 +283,32 @@ class PydanticAgentAdapter(AgentService):
         self.strategist_agent = Agent(
             settings.LLM_MODEL_FLASH3,
             model_settings=flash3_settings,
-            system_prompt=STRATEGIST_PROMPT
+            system_prompt=STRATEGIST_PROMPT,
+            retries=3
         )
 
         self.analyst_agent = Agent(
             settings.LLM_MODEL_PRO3,
             output_type=AnalystOutput,
             model_settings=pro3_settings,
-            system_prompt=ANALYST_PROMPT
+            system_prompt=ANALYST_PROMPT,
+            retries=3
         )
 
         self.swot_risk_agent = Agent(
             settings.LLM_MODEL_FLASH3,
             output_type=SWOTRiskOutput,
             model_settings=flash3_settings,
-            system_prompt=SWOT_RISK_PROMPT
+            system_prompt=SWOT_RISK_PROMPT,
+            retries=3
         )
 
         self.gtm_agent = Agent(
             settings.LLM_MODEL_FLASH3,
             output_type=GTMStrategy,
             model_settings=flash3_settings,
-            system_prompt=GTM_PROMPT
+            system_prompt=GTM_PROMPT,
+            retries=3
         )
 
         # Tool-using agents (Gemini 2.5 Flash for stable multi-turn tool use)
@@ -313,7 +317,8 @@ class PydanticAgentAdapter(AgentService):
             output_type=MarketSizing,
             tools=search_tools,
             model_settings=tool_settings,
-            system_prompt=MARKET_SIZING_PROMPT
+            system_prompt=MARKET_SIZING_PROMPT,
+            retries=3
         )
 
         self.competitor_agent = Agent(
@@ -321,7 +326,8 @@ class PydanticAgentAdapter(AgentService):
             output_type=CompetitiveAnalysis,
             tools=search_tools,
             model_settings=tool_settings,
-            system_prompt=COMPETITOR_PROMPT
+            system_prompt=COMPETITOR_PROMPT,
+            retries=3
         )
 
     def _build_search_tools(self) -> List:
