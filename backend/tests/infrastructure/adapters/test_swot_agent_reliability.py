@@ -157,18 +157,18 @@ class TestSWOTAgentReliability:
                 assert "swot" in result, "Result missing 'swot' field"
                 assert "risks" in result, "Result missing 'risks' field"
 
-                # Validate SWOT quadrants
+                # Validate SWOT quadrants (result returns Pydantic objects)
                 swot = result["swot"]
-                assert "strengths" in swot and len(swot["strengths"]) >= 3, \
-                    f"Strengths should have ≥3 items, got {len(swot.get('strengths', []))}"
-                assert "weaknesses" in swot and len(swot["weaknesses"]) >= 3, \
-                    f"Weaknesses should have ≥3 items, got {len(swot.get('weaknesses', []))}"
-                assert "opportunities" in swot and len(swot["opportunities"]) >= 3, \
-                    f"Opportunities should have ≥3 items, got {len(swot.get('opportunities', []))}"
-                assert "threats" in swot and len(swot["threats"]) >= 3, \
-                    f"Threats should have ≥3 items, got {len(swot.get('threats', []))}"
+                assert len(swot.strengths) >= 3, \
+                    f"Strengths should have ≥3 items, got {len(swot.strengths)}"
+                assert len(swot.weaknesses) >= 3, \
+                    f"Weaknesses should have ≥3 items, got {len(swot.weaknesses)}"
+                assert len(swot.opportunities) >= 3, \
+                    f"Opportunities should have ≥3 items, got {len(swot.opportunities)}"
+                assert len(swot.threats) >= 3, \
+                    f"Threats should have ≥3 items, got {len(swot.threats)}"
 
-                # Validate risks
+                # Validate risks (list of RiskFactor Pydantic objects)
                 risks = result["risks"]
                 assert 4 <= len(risks) <= 7, \
                     f"Risks should be 4-7, got {len(risks)}"
@@ -178,32 +178,32 @@ class TestSWOTAgentReliability:
                 valid_severities = ["low", "medium", "high", "critical"]
 
                 for risk_idx, risk in enumerate(risks):
-                    assert "category" in risk and risk["category"] in valid_categories, \
-                        f"Risk {risk_idx} has invalid category: {risk.get('category')}"
-                    assert "severity" in risk and risk["severity"] in valid_severities, \
-                        f"Risk {risk_idx} has invalid severity: {risk.get('severity')}"
-                    assert "description" in risk and len(risk["description"]) > 10, \
+                    assert risk.category in valid_categories, \
+                        f"Risk {risk_idx} has invalid category: {risk.category}"
+                    assert risk.severity in valid_severities, \
+                        f"Risk {risk_idx} has invalid severity: {risk.severity}"
+                    assert len(risk.description) > 10, \
                         f"Risk {risk_idx} has insufficient description"
-                    assert "mitigation" in risk and len(risk["mitigation"]) > 10, \
+                    assert len(risk.mitigation) > 10, \
                         f"Risk {risk_idx} has insufficient mitigation"
 
                 # Check severity sorting (critical first, then high, then medium, then low)
                 severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
                 for i in range(len(risks) - 1):
-                    current_severity = severity_order[risks[i]["severity"]]
-                    next_severity = severity_order[risks[i + 1]["severity"]]
+                    current_severity = severity_order[risks[i].severity]
+                    next_severity = severity_order[risks[i + 1].severity]
                     assert current_severity <= next_severity, \
-                        f"Risks not sorted by severity: {risks[i]['severity']} before {risks[i+1]['severity']}"
+                        f"Risks not sorted by severity: {risks[i].severity} before {risks[i+1].severity}"
 
                 results.append({
                     "test_case": idx,
                     "idea": test_case["idea"][:100],
                     "status": "SUCCESS",
                     "swot_items": sum([
-                        len(swot["strengths"]),
-                        len(swot["weaknesses"]),
-                        len(swot["opportunities"]),
-                        len(swot["threats"])
+                        len(swot.strengths),
+                        len(swot.weaknesses),
+                        len(swot.opportunities),
+                        len(swot.threats)
                     ]),
                     "risk_count": len(risks)
                 })
@@ -261,10 +261,10 @@ class TestSWOTAgentReliability:
 
         result = await adapter.analyze_swot_risks(spanish_idea, strategic_input)
 
-        # Validate structure
+        # Validate structure (result contains Pydantic objects)
         assert "swot" in result
         assert "risks" in result
-        assert len(result["swot"]["strengths"]) >= 3
+        assert len(result["swot"].strengths) >= 3
         assert 4 <= len(result["risks"]) <= 7
 
         logger.info("✓ Spanish language input test passed")
@@ -279,10 +279,10 @@ class TestSWOTAgentReliability:
 
         result = await adapter.analyze_swot_risks(vague_idea, strategic_input)
 
-        # Even with vague input, should produce structured output
+        # Even with vague input, should produce structured output (Pydantic objects)
         assert "swot" in result
         assert "risks" in result
-        assert len(result["swot"]["strengths"]) >= 3
+        assert len(result["swot"].strengths) >= 3
         assert 4 <= len(result["risks"]) <= 7
 
         logger.info("✓ Vague input test passed")
@@ -297,14 +297,14 @@ class TestSWOTAgentReliability:
 
         result = await adapter.analyze_swot_risks(technical_idea, strategic_input)
 
-        # Validate structure
+        # Validate structure (Pydantic objects)
         assert "swot" in result
         assert "risks" in result
-        assert len(result["swot"]["strengths"]) >= 3
+        assert len(result["swot"].strengths) >= 3
         assert 4 <= len(result["risks"]) <= 7
 
         # Should include technical risks
-        risk_categories = [r["category"] for r in result["risks"]]
+        risk_categories = [r.category for r in result["risks"]]
         assert "technical" in risk_categories or "regulatory" in risk_categories, \
             "Technical product should have technical or regulatory risks"
 
@@ -322,10 +322,10 @@ class TestSWOTAgentReliability:
 
         result = await adapter.analyze_swot_risks(detailed_idea, strategic_input)
 
-        # Validate structure
+        # Validate structure (Pydantic objects)
         assert "swot" in result
         assert "risks" in result
-        assert len(result["swot"]["strengths"]) >= 3
+        assert len(result["swot"].strengths) >= 3
         assert 4 <= len(result["risks"]) <= 7
 
         logger.info("✓ Detailed specification test passed")
