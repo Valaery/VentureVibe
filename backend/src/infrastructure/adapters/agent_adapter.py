@@ -43,6 +43,26 @@ class SWOTRiskOutput(BaseModel):
     risk_mitigations: List[str] = Field(min_length=4, max_length=7, description="Concrete mitigation strategies")
 
 
+class CompetitiveAnalysisOutput(BaseModel):
+    """Flattened schema to avoid nested object issues with Gemini models"""
+    # Direct competitors parallel lists
+    direct_names: List[str] = Field(description="Names of direct competitors")
+    direct_positionings: List[str] = Field(description="Value propositions of direct competitors")
+    direct_weaknesses: List[str] = Field(description="Primary weaknesses of direct competitors")
+    direct_fundings: List[float] = Field(description="Estimated funding in USD Millions. Use 0.0 if unknown.")
+    direct_business_models: List[str] = Field(description="Business models (e.g. B2B SaaS)")
+
+    # Indirect competitors parallel lists
+    indirect_names: List[str] = Field(description="Names of indirect competitors")
+    indirect_positionings: List[str] = Field(description="Value propositions of indirect competitors")
+    indirect_weaknesses: List[str] = Field(description="Primary weaknesses of indirect competitors")
+    indirect_fundings: List[float] = Field(description="Estimated funding in USD Millions. Use 0.0 if unknown.")
+    indirect_business_models: List[str] = Field(description="Business models (e.g. Marketplace)")
+
+    competitive_moat: str = Field(description="Defensible advantage 2-3 sentences")
+    differentiation_score: int = Field(ge=1, le=10, description="1-10 differentiation score")
+
+
 # System prompts for each agent
 STRATEGIST_PROMPT = """You are a Senior Product Strategist with 15+ years of experience refining startup ideas into viable product strategies.
 
@@ -178,20 +198,22 @@ CRITICAL REQUIREMENTS:
    - Recent funding announcements (Crunchbase, TechCrunch, PitchBook)
    - Product positioning from company websites
 
-2. For each competitor, you MUST provide a complete object with these EXACT fields:
-   - name: Real company name
-   - positioning: Their value proposition in one sentence
-   - primary_weakness: Specific gap this idea can exploit
-   - estimated_funding_usd_million: A number (float) or 0.0 if unknown. Do NOT use null.
-   - business_model: e.g. "B2B SaaS", "Marketplace", "Freemium"
+2. For each competitor group, you MUST provide parallel lists with these EXACT fields:
+   - Names: direct_names / indirect_names
+   - Positioning: direct_positionings / indirect_positionings 
+   - Weaknesses: direct_weaknesses / indirect_weaknesses
+   - Funding (float, 0.0 if unknown): direct_fundings / indirect_fundings
+   - Business Model: direct_business_models / indirect_business_models
 
-3. Identify 2-4 direct competitors and 2-3 indirect competitors.
+3. All parallel lists for a group MUST have the same number of items.
 
-4. competitive_moat (2-3 sentences):
+4. Identify 2-4 direct competitors and 2-3 indirect competitors.
+
+5. competitive_moat (2-3 sentences):
    - What defensible advantage could this idea build?
    - Why can't incumbents easily replicate this?
 
-5. differentiation_score: An integer from 1 to 10 (1-3: Crowded/Minimal, 4-6: Clear niche, 7-10: Unique insight/positioning)
+6. differentiation_score: An integer from 1 to 10 (1-3: Crowded/Minimal, 4-6: Clear niche, 7-10: Unique insight/positioning)
 
 SEARCH STRATEGY:
 - "[problem space] competitors"
@@ -203,16 +225,16 @@ Be honest about competitive intensity. Specificity > vague claims.
 
 STRUCTURED EXAMPLE (MUST FOLLOW THIS FORMAT EXACTLY):
 {
-  "direct_competitors": [
-    {
-      "name": "StorySpark",
-      "positioning": "AI-powered personalized children's books.",
-      "primary_weakness": "Limited genre selection and high shipping costs.",
-      "estimated_funding_usd_million": 1.2,
-      "business_model": "D2C Freemium"
-    }
-  ],
-  "indirect_competitors": [],
+  "direct_names": ["StorySpark"],
+  "direct_positionings": ["AI-powered personalized children's books."],
+  "direct_weaknesses": ["Limited genre selection and high shipping costs."],
+  "direct_fundings": [1.2],
+  "direct_business_models": ["D2C Freemium"],
+  "indirect_names": ["Kindle Kids"],
+  "indirect_positionings": ["Mass market digital children's library."],
+  "indirect_weaknesses": ["Generic content, no personalization."],
+  "indirect_fundings": [0.0],
+  "indirect_business_models": ["Subscription"],
   "competitive_moat": "Proprietary fine-tuned model for child-safe narrative generation.",
   "differentiation_score": 7
 }
@@ -442,7 +464,7 @@ class PydanticAgentAdapter(AgentService):
 
         self.competitor_agent = Agent(
             settings.LLM_MODEL,
-            output_type=CompetitiveAnalysis,
+            output_type=CompetitiveAnalysisOutput,
             tools=search_tools,
             model_settings=tool_settings,
             system_prompt=COMPETITOR_PROMPT,
@@ -518,7 +540,38 @@ Research and identify direct and indirect competitors. Use web search to find re
 
             result = await self.competitor_agent.run(prompt)
             logger.info("Competitive Intelligence Analyst agent completed successfully")
-            return result.output
+            
+            # Map flattened output back to nested domain model
+            flat = result.output
+            
+            directs = [
+                Competitor(
+                    name=flat.direct_names[i],
+                    positioning=flat.direct_positionings[i],
+                    primary_weakness=flat.direct_weaknesses[i],
+                    estimated_funding_usd_million=flat.direct_fundings[i],
+                    business_model=flat.direct_business_models[i]
+                )
+                for i in range(len(flat.direct_names))
+            ]
+            
+            indirects = [
+                Competitor(
+                    name=flat.indirect_names[i],
+                    positioning=flat.indirect_positionings[i],
+                    primary_weakness=flat.indirect_weaknesses[i],
+                    estimated_funding_usd_million=flat.indirect_fundings[i],
+                    business_model=flat.indirect_business_models[i]
+                )
+                for i in range(len(flat.indirect_names))
+            ]
+            
+            return CompetitiveAnalysis(
+                direct_competitors=directs,
+                indirect_competitors=indirects,
+                competitive_moat=flat.competitive_moat,
+                differentiation_score=flat.differentiation_score
+            )
         except Exception as e:
             logger.error(f"Competitive Intelligence Analyst agent failed: {type(e).__name__}: {str(e)}", exc_info=True)
             raise

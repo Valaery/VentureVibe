@@ -6,6 +6,7 @@ import { useAuthContext } from '@/features/auth/hooks/useAuthContext';
 import { Button } from '@/components/ui/button';
 import { useResearchMutation } from '@/features/research/hooks/mutations/useResearchMutation';
 import type { ResearchResult } from '@/features/research/data/services/researchService';
+import { ModeToggle } from '@/components/mode-toggle';
 
 const ResearchPage: React.FC = () => {
     const { logout, user } = useAuthContext();
@@ -24,7 +25,7 @@ const ResearchPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-950 dark:via-blue-950/30 dark:to-indigo-950/50 pb-10">
+        <div className="min-h-screen bg-background pb-10">
             <header className="sticky top-0 z-50 border-b border-white/20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60 shadow-lg shadow-primary/5 transition-all duration-300">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
@@ -39,6 +40,7 @@ const ResearchPage: React.FC = () => {
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
+                        <ModeToggle />
                         <div className="hidden md:flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold text-sm shadow-md">
                                 {user?.email?.[0].toUpperCase()}

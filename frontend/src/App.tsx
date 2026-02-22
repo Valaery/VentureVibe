@@ -8,6 +8,8 @@ import RegisterPage from '@/pages/RegisterPage';
 import ResearchPage from '@/pages/ResearchPage';
 import "@/index.css"
 
+import { ThemeProvider } from '@/components/theme-provider';
+
 // Create a client
 const queryClient = new QueryClient();
 
@@ -37,13 +39,15 @@ function AppRoutes() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </Router>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="venturevibe-theme">
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </Router>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

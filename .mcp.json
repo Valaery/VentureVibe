@@ -1,0 +1,93 @@
+{
+    "mcpServers": {
+        "context7": {
+            "type": "stdio",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "npx",
+                "-y",
+                "@upstash/context7-mcp@latest"
+            ]
+        },
+        "sequentialthinking": {
+            "type": "stdio",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "docker",
+                "run",
+                "--rm",
+                "-i",
+                "mcp/sequentialthinking"
+            ]
+        },
+        "playwright": {
+            "type": "stdio",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "npx",
+                "@playwright/mcp@latest"
+            ]
+        },
+        "concurrent-browser": {
+            "type": "stdio",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "npx",
+                "concurrent-browser-mcp",
+                "--max-instances",
+                "20"
+            ]
+        },
+        "memory": {
+            "type": "stdio",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "npx",
+                "-y",
+                "@modelcontextprotocol/server-memory"
+            ]
+        },
+        "github": {
+            "type": "stdio",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "npx",
+                "-y",
+                "@modelcontextprotocol/server-github"
+            ],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
+            }
+        },
+        "sentry": {
+            "type": "http",
+            "url": "https://mcp.sentry.dev/mcp"
+        },
+        "logfire": {
+            "type": "stdio",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "uvx",
+                "logfire-mcp@latest",
+                "--read-token=pylf_v1_us_4gGNXf3SKxkrWvPzCc1Ynw1TcJLjWx2PFH580PcZH3KG"
+            ]
+        },
+        "drawio": {
+            "type": "stdio",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "npx",
+                "-y",
+                "@drawio/mcp"
+            ]
+        }
+    }
+}
