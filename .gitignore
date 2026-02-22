@@ -1,0 +1,14 @@
+# Backend
+.env
+./.venv
+__pycache__/
+*.pyc
+
+
+# Frontend
+.\frontend\node_modules
+check_dom.html
+test_login.ps1
+*.png
+/logo_files
+.claude
